@@ -6,15 +6,27 @@
 #include <stdlib.h>
 #include <stdint.h>
 
+typedef unsigned char char8_t;
+
 typedef struct {
     size_t capacity;
     size_t used;
     void *data;
 } Region;
 
-Region region_alloc_alloc(size_t capacity);
+typedef struct {
+    size_t capacity;
+    size_t length;
+    char8_t *data;
+} String;
+
+Region region_alloc_alloc(size_t capacity); // TODO: rename to region_alloc_region
 void *region_alloc(Region *r, size_t bytes);
 void region_free(Region *r);
+
+String string_create(Region *r, size_t capacity);
+String string_from_literal(Region *r, const char8_t *literal);
+String string_cat_create(Region *r, String s1, String s2);
 
 #ifdef UTIL_IMPLEMENTATION
 
@@ -35,7 +47,7 @@ void *region_alloc(Region *r, size_t bytes)
         return malloc(bytes);
     }
 
-    // TODO: maybe do this in a friendlier way?
+    // TODO: do this friendlier?
     assert(r->used + bytes <= r->capacity);
 
     void *ptr = (uint8_t *)r->data + r->used;
@@ -50,6 +62,62 @@ void region_free(Region *r)
         r->capacity = 0;
         r->used = 0;
     }
+}
+
+String string_create(Region *r, size_t capacity)
+{
+    String s = {
+        .capacity = capacity,
+        .length = 0,
+        .data = region_alloc(r, capacity + 1)
+    };
+
+    for (int i = 0; i < capacity + 1; i++) {
+        s.data[i] = 0;
+    }
+
+    return s;
+}
+
+String string_from_literal(Region *r, const char8_t *literal)
+{
+    size_t literal_length = 0;
+    for (; literal[literal_length] != '\0'; literal_length++);
+
+    String s = {
+        .capacity = literal_length,
+        .length = literal_length,
+        .data = region_alloc(r, literal_length + 1)
+    };
+
+    for (int i = 0; i < literal_length + 1; i++) {
+        s.data[i] = literal[i];
+    }
+
+    return s;
+}
+
+String string_cat_create(Region *r, String s1, String s2)
+{
+    size_t total_length = s1.length + s2.length;
+
+    String s = {
+        .capacity = total_length,
+        .length = total_length,
+        .data = region_alloc(r, total_length + 1)
+    };
+
+    for (int i = 0; i < s1.length; i++) {
+        s.data[i] = s1.data[i];
+    }
+
+    for (int i = 0; i < s2.length; i++) {
+        s.data[i + s1.length] = s2.data[i];
+    }
+
+    s.data[total_length] = '\0';
+
+    return s;
 }
 
 #endif // UTIL_IMPLEMENTATION
