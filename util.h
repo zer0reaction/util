@@ -49,7 +49,8 @@ void *region_alloc(Region *r, size_t bytes)
     }
 
     // TODO: do this in a friendlier way?
-    assert(r->used + bytes <= r->capacity); // TODO: add string message
+    assert(r->used + bytes <= r->capacity &&
+           "error in region_alloc: not enough capacity.");
 
     void *ptr = (uint8_t *)r->data + r->used;
     r->used += bytes;
@@ -123,7 +124,8 @@ String string_cat_create(Region *r, String s1, String s2)
 
 void string_cat(String *s1, String s2)
 {
-    assert(s1->capacity >= s1->length + s2.length); // TODO: add string message
+    assert(s1->capacity >= s1->length + s2.length &&
+           "error in string_cat: not enough capacity.");
 
     for (size_t i = 0; i < s2.length; i++) {
         s1->data[s1->length + i] = s2.data[i];
