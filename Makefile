@@ -1,3 +1,5 @@
+all: 001 002
+
 001:
 	@mkdir -p ./bin
 	gcc -I. -o ./bin/001_region_alloc ./examples/001_region_alloc.c
