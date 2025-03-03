@@ -25,7 +25,7 @@ void *region_alloc(Region *r, size_t bytes);
 void region_free(Region *r);
 
 String string_create(Region *r, size_t capacity);
-String string_from_literal(Region *r, const char8_t *literal);
+String string_from_literal(Region *r, const char *literal);
 String string_cat_create(Region *r, String s1, String s2);
 void string_cat(String *s1, String s2);
 
@@ -73,14 +73,14 @@ String string_create(Region *r, size_t capacity)
         .data = region_alloc(r, capacity + 1)
     };
 
-    for (int i = 0; i < capacity + 1; i++) {
+    for (size_t i = 0; i < capacity + 1; i++) {
         s.data[i] = 0;
     }
 
     return s;
 }
 
-String string_from_literal(Region *r, const char8_t *literal)
+String string_from_literal(Region *r, const char *literal)
 {
     size_t literal_length = 0;
     for (; literal[literal_length] != '\0'; literal_length++);
@@ -91,7 +91,7 @@ String string_from_literal(Region *r, const char8_t *literal)
         .data = region_alloc(r, literal_length + 1)
     };
 
-    for (int i = 0; i < literal_length + 1; i++) {
+    for (size_t i = 0; i < literal_length + 1; i++) {
         s.data[i] = literal[i];
     }
 
@@ -108,11 +108,11 @@ String string_cat_create(Region *r, String s1, String s2)
         .data = region_alloc(r, total_length + 1)
     };
 
-    for (int i = 0; i < s1.length; i++) {
+    for (size_t i = 0; i < s1.length; i++) {
         s.data[i] = s1.data[i];
     }
 
-    for (int i = 0; i < s2.length; i++) {
+    for (size_t i = 0; i < s2.length; i++) {
         s.data[i + s1.length] = s2.data[i];
     }
 
@@ -125,7 +125,7 @@ void string_cat(String *s1, String s2)
 {
     assert(s1->capacity >= s1->length + s2.length); // TODO: add string message
 
-    for (int i = 0; i < s2.length; i++) {
+    for (size_t i = 0; i < s2.length; i++) {
         s1->data[s1->length + i] = s2.data[i];
     }
 
