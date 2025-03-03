@@ -31,6 +31,10 @@ Region region_alloc_alloc(size_t capacity)
 
 void *region_alloc(Region *r, size_t bytes)
 {
+    if (r == NULL) {
+        return malloc(bytes);
+    }
+
     // TODO: maybe do this in a friendlier way?
     assert(r->used + bytes <= r->capacity);
 
