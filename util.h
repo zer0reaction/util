@@ -20,7 +20,7 @@ typedef struct {
     char8_t *data;
 } String;
 
-Region region_alloc_alloc(size_t capacity); // TODO: rename to region_alloc_region
+Region region_create(size_t capacity);
 void *region_alloc(Region *r, size_t bytes);
 void region_free(Region *r);
 
@@ -30,7 +30,7 @@ String string_cat_create(Region *r, String s1, String s2);
 
 #ifdef UTIL_IMPLEMENTATION
 
-Region region_alloc_alloc(size_t capacity)
+Region region_create(size_t capacity)
 {
     Region r = {
         .capacity = capacity,

@@ -5,7 +5,7 @@
 
 int main(void)
 {
-    Region r = region_alloc_alloc(1024 * sizeof(char8_t));
+    Region r = region_create(1024 * sizeof(char8_t));
 
     String s1 = string_from_literal(&r, "Hello, ");
     String s2 = string_from_literal(&r, "Utility Library!");
