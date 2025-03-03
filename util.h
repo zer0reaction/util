@@ -27,6 +27,7 @@ void region_free(Region *r);
 String string_create(Region *r, size_t capacity);
 String string_from_literal(Region *r, const char8_t *literal);
 String string_cat_create(Region *r, String s1, String s2);
+void string_cat(String *s1, String s2);
 
 #ifdef UTIL_IMPLEMENTATION
 
@@ -47,8 +48,8 @@ void *region_alloc(Region *r, size_t bytes)
         return malloc(bytes);
     }
 
-    // TODO: do this friendlier?
-    assert(r->used + bytes <= r->capacity);
+    // TODO: do this in a friendlier way?
+    assert(r->used + bytes <= r->capacity); // TODO: add string message
 
     void *ptr = (uint8_t *)r->data + r->used;
     r->used += bytes;
@@ -118,6 +119,18 @@ String string_cat_create(Region *r, String s1, String s2)
     s.data[total_length] = '\0';
 
     return s;
+}
+
+void string_cat(String *s1, String s2)
+{
+    assert(s1->capacity >= s1->length + s2.length); // TODO: add string message
+
+    for (int i = 0; i < s2.length; i++) {
+        s1->data[s1->length + i] = s2.data[i];
+    }
+
+    s1->length += s2.length;
+    s1->data[s1->length] = '\0';
 }
 
 #endif // UTIL_IMPLEMENTATION

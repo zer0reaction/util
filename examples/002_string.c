@@ -13,6 +13,12 @@ int main(void)
 
     printf("%s\n", s3.data);
 
+    String s = string_create(&r, 128);
+    string_cat(&s, string_from_literal(&r, "1, "));
+    string_cat(&s, string_from_literal(&r, "2, 3"));
+
+    printf("%s\n", s.data);
+
     region_free(&r);
     return 0;
 }

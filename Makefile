@@ -4,4 +4,4 @@
 
 002:
 	@mkdir -p ./bin
-	gcc -I. -o ./bin/002_strings_basic ./examples/002_strings_basic.c
+	gcc -I. -o ./bin/002_string ./examples/002_string.c
