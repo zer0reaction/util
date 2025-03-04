@@ -6,7 +6,7 @@
 
 Regions are stored as a linked list and have a default capacity of 4096 bytes (you can change that with `ARENA_REGION_DEFAULT_CAPACITY` preprocessor directive). Pointers to the first and the last region are stored in the arena struct.
 
-When the `arena_alloc` is called, it allocatates memory on the first region that has enough free space to store the data. If there are no such regions, one is created and placed at the end of the linked list. If you are allocating more than `ARENA_REGION_DEFAULT_CAPACITY`, then a region of such size will be created and placed at the end of the linked list.
+When the `arena_alloc` is called, it allocates memory on the last region of the linked list. If there are no regions yet or there is not enough memory on the last region, one is created and placed at the end of the linked list. If you are allocating more than `ARENA_REGION_DEFAULT_CAPACITY`, then a region of such size will be created and placed at the end of the linked list.
 
 `arena_alloc` behaves like `malloc` if `NULL` is passed instead of arena pointer.
 

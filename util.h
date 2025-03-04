@@ -69,21 +69,15 @@ void *arena_alloc(Arena *a, size_t bytes)
         return a->end->data;
     }
 
-    Arena_Region *current_region = a->start;
-
-    while (current_region != NULL) {
-        if (current_region->used + bytes <= current_region->capacity) {
-            void *ptr = (uint8_t *)current_region->data + current_region->used;
-            current_region->used += bytes;
-            return ptr;
-        }
-
-        current_region = current_region->next;
+    if (a->end->used + bytes <= a->end->capacity) {
+        void *ptr = (uint8_t *)a->end->data + a->end->used;
+        a->end->used += bytes;
+        return ptr;
+    } else {
+        a->end->next = arena_region_create(bytes);
+        a->end = a->end->next;
+        return a->end->data;
     }
-
-    a->end->next = arena_region_create(bytes);
-    a->end = a->end->next;
-    return a->end->data;
 }
 
 void arena_free(Arena *a)
