@@ -45,7 +45,7 @@ Concatenates `s1` and `s2` by creating a new string on the arena (or on the heap
 ### `string_cat`
 
 ```c
-void string_cat(String *s1, String s2);
+void *string_cat(String *s1, String s2);
 ```
 
-Concatenates `s1` and `s2` by appending `s2`'s contents to the end of `s1`. The string is automatically null-terminated. If there is not enough capacity, assertion fails and program exits with failure error code (TODO). Note, that nor capacity neither length do not include the null-termination byte.
+Concatenates `s1` and `s2` by appending `s2`'s contents to the end of `s1`. The string is automatically null-terminated. On success, returns `s1`. If there is not enough capacity, `NULL` is returned. Note, that nor capacity neither length do not include the null-termination byte.

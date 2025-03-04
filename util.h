@@ -2,7 +2,6 @@
 #define UTIL_H_
 
 #include <stddef.h>
-#include <assert.h>
 #include <stdlib.h>
 #include <stdint.h>
 
@@ -36,7 +35,7 @@ void arena_free(Arena *a);
 String string_create(Arena *a, size_t capacity);
 String string_from_literal(Arena *a, const char *literal);
 String string_cat_create(Arena *a, String s1, String s2);
-void string_cat(String *s1, String s2);
+void *string_cat(String *s1, String s2);
 
 #ifdef UTIL_IMPLEMENTATION
 
@@ -150,10 +149,11 @@ String string_cat_create(Arena *a, String s1, String s2)
     return s;
 }
 
-void string_cat(String *s1, String s2)
+void *string_cat(String *s1, String s2)
 {
-    assert(s1->capacity >= s1->length + s2.length &&
-           "error in string_cat: not enough capacity.");
+    if (s1->capacity < s1->length + s2.length) {
+        return NULL;
+    }
 
     for (size_t i = 0; i < s2.length; i++) {
         s1->data[s1->length + i] = s2.data[i];
@@ -161,6 +161,8 @@ void string_cat(String *s1, String s2)
 
     s1->length += s2.length;
     s1->data[s1->length] = '\0';
+
+    return s1;
 }
 
 #endif // UTIL_IMPLEMENTATION
