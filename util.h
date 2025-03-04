@@ -6,13 +6,23 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-typedef unsigned char char8_t;
+#ifndef ARENA_REGION_DEFAULT_CAPACITY
+#define ARENA_REGION_DEFAULT_CAPACITY (4*1024)
+#endif // ARENA_REGION_DEFAULT_CAPACITY
 
-typedef struct {
+typedef unsigned char char8_t;
+typedef struct Arena_Region Arena_Region;
+
+struct Arena_Region {
+    Arena_Region *next;
     size_t capacity;
     size_t used;
     void *data;
-} Region;
+};
+
+typedef struct {
+    Arena_Region *start, *end;
+} Arena;
 
 typedef struct {
     size_t capacity;
@@ -20,58 +30,76 @@ typedef struct {
     char8_t *data;
 } String;
 
-Region region_create(size_t capacity);
-void *region_alloc(Region *r, size_t bytes);
-void region_free(Region *r);
+void *arena_alloc(Arena *a, size_t bytes);
+void arena_free(Arena *a);
 
-String string_create(Region *r, size_t capacity);
-String string_from_literal(Region *r, const char *literal);
-String string_cat_create(Region *r, String s1, String s2);
+String string_create(Arena *a, size_t capacity);
+String string_from_literal(Arena *a, const char *literal);
+String string_cat_create(Arena *a, String s1, String s2);
 void string_cat(String *s1, String s2);
 
 #ifdef UTIL_IMPLEMENTATION
 
-Region region_create(size_t capacity)
-{
-    Region r = {
-        .capacity = capacity,
-        .used = 0,
-        .data = malloc(capacity)
-    };
+Arena_Region *arena_region_create(size_t bytes) {
+    Arena_Region *r = malloc(sizeof(Arena_Region));
+
+    r->next = NULL;
+
+    if (bytes > ARENA_REGION_DEFAULT_CAPACITY) {
+        r->capacity = bytes;
+        r->data = malloc(bytes);
+    } else {
+        r->capacity = ARENA_REGION_DEFAULT_CAPACITY;
+        r->data = malloc(ARENA_REGION_DEFAULT_CAPACITY);
+    }
+
+    r->used = bytes;
 
     return r;
 }
 
-void *region_alloc(Region *r, size_t bytes)
+void *arena_alloc(Arena *a, size_t bytes)
 {
-    if (r == NULL) {
+    if (a == NULL) {
         return malloc(bytes);
     }
 
-    // TODO: do this in a friendlier way?
-    assert(r->used + bytes <= r->capacity &&
-           "error in region_alloc: not enough capacity.");
+    if (a->start == NULL) {
+        a->start = a->end = arena_region_create(bytes);
+        return a->end->data;
+    }
 
-    void *ptr = (uint8_t *)r->data + r->used;
-    r->used += bytes;
-    return ptr;
-}
-
-void region_free(Region *r)
-{
-    if (r->capacity) {
-        free(r->data);
-        r->capacity = 0;
-        r->used = 0;
+    if (a->end->used + bytes <= a->end->capacity) {
+        void *ptr = (uint8_t *)a->end->data + a->end->used;
+        a->end->used += bytes;
+        return ptr;
+    } else {
+        a->end->next = arena_region_create(bytes);
+        a->end = a->end->next;
+        return a->end->data;
     }
 }
 
-String string_create(Region *r, size_t capacity)
+void arena_free(Arena *a)
+{
+    Arena_Region *r = a->start;
+
+    while (r != NULL) {
+        Arena_Region *next_region = r->next;
+        free(r->data);
+        free(r);
+        r = next_region;
+    }
+
+    a->start = a->end = NULL;
+}
+
+String string_create(Arena *a, size_t capacity)
 {
     String s = {
         .capacity = capacity,
         .length = 0,
-        .data = region_alloc(r, capacity + 1)
+        .data = arena_alloc(a, capacity + 1)
     };
 
     for (size_t i = 0; i < capacity + 1; i++) {
@@ -81,7 +109,7 @@ String string_create(Region *r, size_t capacity)
     return s;
 }
 
-String string_from_literal(Region *r, const char *literal)
+String string_from_literal(Arena *a, const char *literal)
 {
     size_t literal_length = 0;
     for (; literal[literal_length] != '\0'; literal_length++);
@@ -89,7 +117,7 @@ String string_from_literal(Region *r, const char *literal)
     String s = {
         .capacity = literal_length,
         .length = literal_length,
-        .data = region_alloc(r, literal_length + 1)
+        .data = arena_alloc(a, literal_length + 1)
     };
 
     for (size_t i = 0; i < literal_length + 1; i++) {
@@ -99,14 +127,14 @@ String string_from_literal(Region *r, const char *literal)
     return s;
 }
 
-String string_cat_create(Region *r, String s1, String s2)
+String string_cat_create(Arena *a, String s1, String s2)
 {
     size_t total_length = s1.length + s2.length;
 
     String s = {
         .capacity = total_length,
         .length = total_length,
-        .data = region_alloc(r, total_length + 1)
+        .data = arena_alloc(a, total_length + 1)
     };
 
     for (size_t i = 0; i < s1.length; i++) {
