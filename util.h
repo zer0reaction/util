@@ -36,10 +36,12 @@ String string_create(Arena *a, size_t capacity);
 String string_from_literal(Arena *a, const char *literal);
 String string_cat_create(Arena *a, String s1, String s2);
 void *string_cat(String *s1, String s2);
+void string_free(String *s1);
 
 #ifdef UTIL_IMPLEMENTATION
 
-Arena_Region *arena_region_create(size_t bytes) {
+Arena_Region *arena_region_create(size_t bytes)
+{
     Arena_Region *r = malloc(sizeof(Arena_Region));
 
     r->next = NULL;
@@ -163,6 +165,17 @@ void *string_cat(String *s1, String s2)
     s1->data[s1->length] = '\0';
 
     return s1;
+}
+
+void string_free(String *s1)
+{
+    if (s1->data != NULL) {
+        free(s1->data);
+
+        s1->data = NULL;
+        s1->capacity = 0;
+        s1->length = 0;
+    }
 }
 
 #endif // UTIL_IMPLEMENTATION

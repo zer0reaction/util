@@ -23,6 +23,11 @@ int main(void)
 
     printf("%s\n", s.data);
 
+    String on_heap = string_from_literal(NULL, "This string is allocated using malloc directly, use string_free in this case and only in this case");
+    printf("%s\n", on_heap.data);
+    string_free(&on_heap);
+    string_free(&on_heap); // does nothing
+
     arena_free(&arena);
     return 0;
 }

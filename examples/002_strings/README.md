@@ -24,7 +24,7 @@ typedef struct {
 String string_create(Arena *a, size_t capacity);
 ```
 
-Allocates an UTF-8 encoded string of the specified capacity on the arena (or on the heap if `NULL` is passed) and fills it with zeros. The string is automatically null-terminated. Note, that capacity does not include the null-termination byte, so creating a string of size `0` you allocate one byte of memory.
+Allocates an UTF-8 encoded string of the specified capacity on the arena (or on the heap if `NULL` is passed; not recommended to do this) and fills it with zeros. The string is automatically null-terminated. Note, that capacity does not include the null-termination byte, so creating a string of size `0` you allocate one byte of memory.
 
 ### `string_from_literal`
 
@@ -32,7 +32,7 @@ Allocates an UTF-8 encoded string of the specified capacity on the arena (or on 
 String string_from_literal(Arena *a, const char *literal);
 ```
 
-Allocates an UTF-8 encoded string on the arena (or on the heap if `NULL` is passed) and copies the characters from the string literal to the string. The string is automatically null-terminated. The capacity of the new string is the length of the string literal. Note, that capacity does not include the null-termination byte.
+Allocates an UTF-8 encoded string on the arena (or on the heap if `NULL` is passed; not recommended to do this) and copies the characters from the string literal to the string. The string is automatically null-terminated. The capacity of the new string is the length of the string literal. Note, that capacity does not include the null-termination byte.
 
 ### `string_cat_create`
 
@@ -40,7 +40,7 @@ Allocates an UTF-8 encoded string on the arena (or on the heap if `NULL` is pass
 String string_cat_create(Arena *a, String s1, String s2);
 ```
 
-Concatenates `s1` and `s2` by creating a new string on the arena (or on the heap if `NULL` is passed) with the capacity of `s1.length + s2.length`. String is automatically null-terminated.
+Concatenates `s1` and `s2` by creating a new string on the arena (or on the heap if `NULL` is passed; not recommended to do this) with the capacity of `s1.length + s2.length`. String is automatically null-terminated.
 
 ### `string_cat`
 
@@ -49,3 +49,11 @@ void *string_cat(String *s1, String s2);
 ```
 
 Concatenates `s1` and `s2` by appending `s2`'s contents to the end of `s1`. The string is automatically null-terminated. On success, returns `s1`. If there is not enough capacity, `NULL` is returned. Note, that nor capacity neither length do not include the null-termination byte.
+
+### `string_free`
+
+```c
+void string_free(String *s1);
+```
+
+Shoud be called **only if string is allocated on the heap (for example, created with `string_create(NULL, capacity)`)**, otherwise you are going to ruin the arena region. Frees the memory allocated to the string. Has a guard for double free.
