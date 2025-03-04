@@ -11,7 +11,7 @@ Start exploring the library by visiting the [examples](./examples)
 
 ## Quick start
 
-You can just simply copy-paste the library header and start using it.
+You can just simply copy-paste the library header file and start using it.
 
 ```c
 #define UTIL_IMPLEMENTATION
