@@ -14,9 +14,9 @@ typedef struct {
 } String;
 ```
 
-`capacity` - number of characters that a string can hold (not including the null-termination byte)
-`length` - current number of characters in the string (not including the null-termination byte)
-`data` - pointer to the start of the string
+- `capacity` - number of characters that a string can hold (not including the null-termination byte)
+- `length` - current number of characters in the string (not including the null-termination byte)
+- `data` - pointer to the start of the string
 
 ### `string_create`
 
