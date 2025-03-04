@@ -14,6 +14,8 @@ When `arena_free` is called, arena is freed by walking through the linked list a
 
 ## Function description
 
+(Do not forget to add `UTIL_IMPLEMENTATION` preprocessor directive if you need the implementations of the functions and not just the library header)
+
 ### `arena_alloc`
 
 ```c
@@ -31,8 +33,6 @@ void arena_free(Arena *a);
 Frees all the regions and memory in them.
 
 ## Basic Usage
-
-(Do not forget to add `UTIL_IMPLEMENTATION` preprocessor directive if you need the implementations of the functions and not just the library header)
 
 To use the arena allocator you first need to create an empty `Arena` struct:
 
