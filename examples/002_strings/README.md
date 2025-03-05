@@ -50,6 +50,14 @@ void *string_cat(String *s1, String s2);
 
 Concatenates `s1` and `s2` by appending `s2`'s contents to the end of `s1`. The string is automatically null-terminated. On success, returns `s1`. If there is not enough capacity, `NULL` is returned. Note, that nor capacity neither length do not include the null-termination byte.
 
+### `string_read_file`
+
+```c
+String string_read_file(Arena *a, const char *path);
+```
+
+Reads all the contens of the file into string's `data` and returns it. If file can't be opened, string's `data` is set to NULL. The string is automatically null-terminated.
+
 ### `string_free`
 
 ```c

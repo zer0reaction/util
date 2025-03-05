@@ -14,6 +14,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 #include <stddef.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <stdio.h>
 
 #ifndef ARENA_REGION_DEFAULT_CAPACITY
 #define ARENA_REGION_DEFAULT_CAPACITY (4*1024)
@@ -46,6 +47,7 @@ String string_create(Arena *a, size_t capacity);
 String string_from_literal(Arena *a, const char *literal);
 String string_cat_create(Arena *a, String s1, String s2);
 void *string_cat(String *s1, String s2);
+String string_read_file(Arena *a, const char *path);
 void string_free(String *s1);
 
 #ifdef UTIL_IMPLEMENTATION
@@ -164,6 +166,7 @@ String string_cat_create(Arena *a, String s1, String s2)
 void *string_cat(String *s1, String s2)
 {
     if (s1->capacity < s1->length + s2.length) {
+        // TODO: this is not good
         return NULL;
     }
 
@@ -175,6 +178,27 @@ void *string_cat(String *s1, String s2)
     s1->data[s1->length] = '\0';
 
     return s1;
+}
+
+String string_read_file(Arena *a, const char *path) {
+    FILE *file = fopen(path, "rb");
+
+    if (file == NULL) {
+        // TODO: this can be probably done better
+        String s = {0};
+        return s;
+    }
+
+    fseek(file, 0, SEEK_END);
+    size_t file_size = ftell(file);
+    fseek(file, 0, SEEK_SET);
+
+    String s = string_create(a, file_size);
+    s.length = file_size;
+    fread(s.data, file_size, 1, file);
+
+    fclose(file);
+    return s;
 }
 
 void string_free(String *s1)
