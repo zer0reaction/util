@@ -180,7 +180,8 @@ void *string_cat(String *s1, String s2)
     return s1;
 }
 
-String string_read_file(Arena *a, const char *path) {
+String string_read_file(Arena *a, const char *path)
+{
     FILE *file = fopen(path, "rb");
 
     if (file == NULL) {
