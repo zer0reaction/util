@@ -8,6 +8,10 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+#ifndef ARENA_REGION_DEFAULT_CAPACITY
+#define ARENA_REGION_DEFAULT_CAPACITY (4*1024)
+#endif // ARENA_REGION_DEFAULT_CAPACITY
+
 #ifndef UTIL_H_
 #define UTIL_H_
 
@@ -15,10 +19,6 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdio.h>
-
-#ifndef ARENA_REGION_DEFAULT_CAPACITY
-#define ARENA_REGION_DEFAULT_CAPACITY (4*1024)
-#endif // ARENA_REGION_DEFAULT_CAPACITY
 
 typedef unsigned char char8_t;
 typedef struct Arena_Region Arena_Region;
@@ -49,6 +49,8 @@ String string_cat_create(Arena *a, String s1, String s2);
 void *string_cat(String *s1, String s2);
 String string_read_file(Arena *a, const char *path);
 void string_free(String *s1);
+
+#endif // UTIL_H_
 
 #ifdef UTIL_IMPLEMENTATION
 
@@ -214,5 +216,3 @@ void string_free(String *s1)
 }
 
 #endif // UTIL_IMPLEMENTATION
-
-#endif // UTIL_H_
