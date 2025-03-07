@@ -27,6 +27,8 @@ typedef struct {
 void *arena_alloc(Arena *a, size_t bytes);
 void arena_free(Arena *a);
 
+char8_t *read_whole_file(Arena *a, const char *path);
+
 #ifdef UTIL_IMPLEMENTATION
 
 Arena_Region *arena_region_create(size_t bytes)
@@ -82,6 +84,25 @@ void arena_free(Arena *a)
     }
 
     a->start = a->end = NULL;
+}
+
+char8_t *read_whole_file(Arena *a, const char *path)
+{
+    FILE *file = fopen(path, "rb");
+
+    if (file == NULL) {
+        return NULL;
+    }
+
+    fseek(file, 0, SEEK_END);
+    size_t file_size = ftell(file);
+    fseek(file, 0, SEEK_SET);
+
+    char8_t *file_data = arena_alloc(a, file_size + 1);
+    fread(file_data, file_size, 1, file);
+    file_data[file_size] = '\0';
+
+    return file_data;
 }
 
 #endif // UTIL_IMPLEMENTATION
