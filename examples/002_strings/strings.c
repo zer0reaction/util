@@ -28,6 +28,11 @@ int main(void)
     string_free(&on_heap);
     string_free(&on_heap); // does nothing
 
+    char8_t *buffer = arena_alloc(&arena, 1024);
+    scanf("%s", buffer);
+    String from_buffer = string_from_buffer(&arena, buffer);
+    printf("This string is copied from the buffer: %s\n", from_buffer.data);
+
     arena_free(&arena);
     return 0;
 }

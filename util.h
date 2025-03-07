@@ -45,6 +45,7 @@ void arena_free(Arena *a);
 
 String string_create(Arena *a, size_t capacity);
 String string_from_literal(Arena *a, const char *literal);
+String string_from_buffer(Arena *a, char8_t *buffer);
 String string_cat_create(Arena *a, String s1, String s2);
 void *string_cat(String *s1, String s2);
 String string_read_file(Arena *a, const char *path);
@@ -137,6 +138,24 @@ String string_from_literal(Arena *a, const char *literal)
 
     for (size_t i = 0; i < literal_length + 1; i++) {
         s.data[i] = literal[i];
+    }
+
+    return s;
+}
+
+String string_from_buffer(Arena *a, char8_t *buffer)
+{
+    size_t buffer_length = 0;
+    for (; buffer[buffer_length] != '\0'; buffer_length++);
+
+    String s = {
+        .capacity = buffer_length,
+        .length = buffer_length,
+        .data = arena_alloc(a, buffer_length + 1)
+    };
+
+    for (size_t i = 0; i < buffer_length + 1; i++) {
+        s.data[i] = buffer[i];
     }
 
     return s;

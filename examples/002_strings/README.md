@@ -34,6 +34,14 @@ String string_from_literal(Arena *a, const char *literal);
 
 Allocates an UTF-8 encoded string on the arena (or on the heap if `NULL` is passed; not recommended to do this) and copies the characters from the string literal to the string. The string is automatically null-terminated. The capacity of the new string is the length of the string literal. Note, that capacity does not include the null-termination byte.
 
+### `string_from_buffer`
+
+```c
+String string_from_buffer(Arena *a, char8_t *buffer);
+```
+
+Allocates an UTF-8 encoded string on the arena (or on the heap if `NULL` is passed; not recommended to do this) and copies the characters from the buffer to the string until null-terminator is reached. The string is automatically null-terminated. The capacity of the new string is the length of the buffer. Note, that capacity does not include the null-termination byte.
+
 ### `string_cat_create`
 
 ```c
