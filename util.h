@@ -1,18 +1,20 @@
 #ifndef UTIL_H_
 #define UTIL_H_
 
-#ifndef ARENA_REGION_DEFAULT_CAPACITY
-#define ARENA_REGION_DEFAULT_CAPACITY (4*1024)
-#endif // ARENA_REGION_DEFAULT_CAPACITY
-
 #include <stddef.h>
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdio.h>
 
-typedef unsigned char char8_t;
-typedef struct Arena_Region Arena_Region;
+#ifndef ARENA_REGION_DEFAULT_CAPACITY
+#define ARENA_REGION_DEFAULT_CAPACITY (4*1024)
+#endif // ARENA_REGION_DEFAULT_CAPACITY
 
+#define list_create(arena, T, size) internal_list_create(arena, size, sizeof(T))
+
+typedef unsigned char char8_t;
+
+typedef struct Arena_Region Arena_Region;
 struct Arena_Region {
     Arena_Region *next;
     size_t capacity;
@@ -20,12 +22,21 @@ struct Arena_Region {
     void *data;
 };
 
-typedef struct {
+typedef struct Arena Arena;
+struct Arena {
     Arena_Region *start, *end;
-} Arena;
+};
+
+typedef struct List_Header List_Header;
+struct List_Header {
+    size_t size;
+    size_t stride;
+};
 
 void *arena_alloc(Arena *a, size_t bytes);
 void arena_free(Arena *a);
+void *internal_list_create(Arena *a, size_t size, size_t stride);
+size_t list_get_size(void *list);
 
 #ifdef UTIL_IMPLEMENTATION
 
@@ -82,6 +93,21 @@ void arena_free(Arena *a)
     }
 
     a->start = a->end = NULL;
+}
+
+void *internal_list_create(Arena *a, size_t size, size_t stride) {
+    size_t allocd_size = sizeof(List_Header) + (size * stride);
+
+    void *list = arena_alloc(a, allocd_size);
+    ((List_Header *)list)->size = size;
+    ((List_Header *)list)->stride = stride;
+
+    return (char *)list + sizeof(List_Header);
+}
+
+size_t list_get_size(void *list) {
+    List_Header *header = (List_Header *)list - 1;
+    return header->size;
 }
 
 #endif // UTIL_IMPLEMENTATION
