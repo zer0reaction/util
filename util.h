@@ -33,15 +33,19 @@ struct List_Header {
     size_t stride;
 };
 
-void *arena_alloc(Arena *a, size_t bytes);
-void arena_free(Arena *a);
+extern void *arena_alloc(Arena *a, size_t bytes);
+extern void *arena_realloc(Arena *a, void *old_ptr, size_t old_size, size_t new_size);
+extern void arena_free(Arena *a);
+extern size_t list_get_size(void *list);
+
+Arena_Region *internal_arena_region_create(size_t bytes);
 void *internal_list_create(Arena *a, size_t size, size_t stride);
-size_t list_get_size(void *list);
+
+#endif // UTIL_H_
 
 #ifdef UTIL_IMPLEMENTATION
 
-Arena_Region *arena_region_create(size_t bytes)
-{
+Arena_Region *internal_arena_region_create(size_t bytes) {
     Arena_Region *r = malloc(sizeof(Arena_Region));
 
     r->next = NULL;
@@ -59,14 +63,13 @@ Arena_Region *arena_region_create(size_t bytes)
     return r;
 }
 
-void *arena_alloc(Arena *a, size_t bytes)
-{
+void *arena_alloc(Arena *a, size_t bytes) {
     if (a == NULL) {
         return malloc(bytes);
     }
 
     if (a->start == NULL) {
-        a->start = a->end = arena_region_create(bytes);
+        a->start = a->end = internal_arena_region_create(bytes);
         return a->end->data;
     }
 
@@ -75,14 +78,13 @@ void *arena_alloc(Arena *a, size_t bytes)
         a->end->used += bytes;
         return ptr;
     } else {
-        a->end->next = arena_region_create(bytes);
+        a->end->next = internal_arena_region_create(bytes);
         a->end = a->end->next;
         return a->end->data;
     }
 }
 
-void arena_free(Arena *a)
-{
+void arena_free(Arena *a) {
     Arena_Region *r = a->start;
 
     while (r != NULL) {
@@ -111,5 +113,3 @@ size_t list_get_size(void *list) {
 }
 
 #endif // UTIL_IMPLEMENTATION
-
-#endif // UTIL_H_
