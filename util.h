@@ -9,9 +9,9 @@
 #define ARENA_REGION_DEFAULT_CAPACITY (4*1024)
 #endif // ARENA_REGION_DEFAULT_CAPACITY
 
-#define list_create(arena, T, size) internal_list_create(arena, size, sizeof(T))
+#define UTIL_MAX(a, b) ((a > b) ? a : b)
 
-typedef unsigned char char8_t;
+#define list_create(arena, T, size) internal_list_create(arena, size, sizeof(T))
 
 typedef struct Arena_Region Arena_Region;
 struct Arena_Region {
@@ -32,13 +32,12 @@ struct List_Header {
     size_t stride;
 };
 
+// TODO: add arena_alloc_reallocatable
 extern void *arena_alloc(Arena *a, size_t bytes);
-extern void *arena_realloc(Arena *a, void *old_ptr, size_t old_size, size_t new_size);
 extern void arena_free(Arena *a);
-extern size_t list_get_size(void *list);
 
-extern Arena_Region *internal_arena_region_create(size_t bytes);
-extern void *internal_list_create(Arena *a, size_t size, size_t stride);
+extern size_t list_get_size(void *list);
+extern size_t list_get_stride(void *list);
 
 #endif // UTIL_H_
 
@@ -46,26 +45,18 @@ extern void *internal_list_create(Arena *a, size_t size, size_t stride);
 
 Arena_Region *internal_arena_region_create(size_t bytes) {
     Arena_Region *r = malloc(sizeof(Arena_Region));
+    size_t region_capacity = UTIL_MAX(ARENA_REGION_DEFAULT_CAPACITY, bytes);
 
     r->next = NULL;
-
-    if (bytes > ARENA_REGION_DEFAULT_CAPACITY) {
-        r->capacity = bytes;
-        r->data = malloc(bytes);
-    } else {
-        r->capacity = ARENA_REGION_DEFAULT_CAPACITY;
-        r->data = malloc(ARENA_REGION_DEFAULT_CAPACITY);
-    }
-
+    r->capacity = region_capacity;
     r->used = bytes;
+    r->data = malloc(region_capacity);
 
     return r;
 }
 
 void *arena_alloc(Arena *a, size_t bytes) {
-    if (a == NULL) {
-        return malloc(bytes);
-    }
+    if (a == NULL) return malloc(bytes);
 
     if (a->start == NULL) {
         a->start = a->end = internal_arena_region_create(bytes);
@@ -81,18 +72,6 @@ void *arena_alloc(Arena *a, size_t bytes) {
         a->end = a->end->next;
         return a->end->data;
     }
-}
-
-void *arena_realloc(Arena *a, void *old_ptr, size_t old_size, size_t new_size) {
-    if (new_size <= old_size) {
-        return old_ptr;
-    }
-
-    void *new_ptr = arena_alloc(a, new_size);
-    for (size_t i = 0; i < old_size; ++i) {
-        ((char *)new_ptr)[i] = ((char *)old_ptr)[i];
-    }
-    return new_ptr;
 }
 
 void arena_free(Arena *a) {
@@ -111,9 +90,10 @@ void arena_free(Arena *a) {
 void *internal_list_create(Arena *a, size_t size, size_t stride) {
     size_t allocd_size = sizeof(List_Header) + (size * stride);
 
-    void *list = arena_alloc(a, allocd_size);
-    ((List_Header *)list)->size = size;
-    ((List_Header *)list)->stride = stride;
+    void *list = arena_alloc(a, allocd_size); // TODO: change to arena_alloc_reallocatable
+    List_Header *header = (List_Header *)list;
+    header->size = size;
+    header->stride = stride;
 
     return (char *)list + sizeof(List_Header);
 }
@@ -121,6 +101,11 @@ void *internal_list_create(Arena *a, size_t size, size_t stride) {
 size_t list_get_size(void *list) {
     List_Header *header = (List_Header *)list - 1;
     return header->size;
+}
+
+size_t list_get_stride(void *list) {
+    List_Header *header = (List_Header *)list - 1;
+    return header->stride;
 }
 
 #undef UTIL_IMPLEMENTATION
