@@ -74,7 +74,7 @@ void *arena_alloc(Arena *a, size_t bytes) {
     }
 
     if (a->end->used + bytes <= a->end->capacity) {
-        void *ptr = (uint8_t *)a->end->data + a->end->used;
+        void *ptr = (char *)a->end->data + a->end->used;
         a->end->used += bytes;
         return ptr;
     } else {
@@ -82,6 +82,18 @@ void *arena_alloc(Arena *a, size_t bytes) {
         a->end = a->end->next;
         return a->end->data;
     }
+}
+
+void *arena_realloc(Arena *a, void *old_ptr, size_t old_size, size_t new_size) {
+    if (new_size <= old_size) {
+        return old_ptr;
+    }
+
+    void *new_ptr = arena_alloc(a, new_size);
+    for (size_t i = 0; i < old_size; ++i) {
+        ((char *)new_ptr)[i] = ((char *)old_ptr)[i];
+    }
+    return new_ptr;
 }
 
 void arena_free(Arena *a) {
@@ -112,4 +124,5 @@ size_t list_get_size(void *list) {
     return header->size;
 }
 
+#undef UTIL_IMPLEMENTATION
 #endif // UTIL_IMPLEMENTATION
