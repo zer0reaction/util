@@ -38,8 +38,8 @@ extern void *arena_realloc(Arena *a, void *old_ptr, size_t old_size, size_t new_
 extern void arena_free(Arena *a);
 extern size_t list_get_size(void *list);
 
-Arena_Region *internal_arena_region_create(size_t bytes);
-void *internal_list_create(Arena *a, size_t size, size_t stride);
+extern Arena_Region *internal_arena_region_create(size_t bytes);
+extern void *internal_list_create(Arena *a, size_t size, size_t stride);
 
 #endif // UTIL_H_
 
