@@ -6,7 +6,7 @@
 #include <stdint.h>
 
 #ifndef ARENA_REGION_DEFAULT_CAPACITY
-#define ARENA_REGION_DEFAULT_CAPACITY (4*1024)
+#define ARENA_REGION_DEFAULT_CAPACITY (8*1024)
 #endif // ARENA_REGION_DEFAULT_CAPACITY
 
 #define UTIL_MAX(a, b) ((a > b) ? a : b)
@@ -38,6 +38,7 @@ extern void arena_free(Arena *a);
 
 extern size_t array_get_size(void *array);
 extern size_t array_get_stride(void *array);
+// TODO: add array_resize
 
 #endif // UTIL_H_
 
@@ -75,9 +76,7 @@ void *arena_alloc(Arena *a, size_t bytes) {
 }
 
 void *arena_realloc(Arena *a, void *ptr, size_t old_size, size_t new_size) {
-    if (new_size <= old_size) {
-        return ptr;
-    }
+    if (new_size <= old_size) return ptr;
 
     char *new_ptr = arena_alloc(a, new_size);
     char *ptr_char = (char *)ptr;
