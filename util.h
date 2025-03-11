@@ -33,6 +33,7 @@ struct Array_Header {
 };
 
 extern void *arena_alloc(Arena *a, size_t bytes);
+extern void *arena_realloc(Arena *a, void *ptr, size_t old_size, size_t new_size);
 extern void arena_free(Arena *a);
 
 extern size_t array_get_size(void *array);
@@ -71,6 +72,21 @@ void *arena_alloc(Arena *a, size_t bytes) {
         a->end = a->end->next;
         return a->end->data;
     }
+}
+
+void *arena_realloc(Arena *a, void *ptr, size_t old_size, size_t new_size) {
+    if (new_size <= old_size) {
+        return ptr;
+    }
+
+    char *new_ptr = arena_alloc(a, new_size);
+    char *ptr_char = (char *)ptr;
+    char *new_ptr_char = (char *)new_ptr;
+    for (size_t i = 0; i < old_size; ++i) {
+        new_ptr_char[i] = ptr_char[i];
+    }
+
+    return new_ptr;
 }
 
 void arena_free(Arena *a) {
