@@ -11,7 +11,7 @@
 
 #define UTIL_MAX(a, b) ((a > b) ? a : b)
 
-#define array_create(arena, T, size) internal_array_create(arena, size, sizeof(T))
+#define list_create(arena, T, size) internal_list_create(arena, size, sizeof(T))
 
 typedef struct Arena_Region Arena_Region;
 struct Arena_Region {
@@ -26,8 +26,8 @@ struct Arena {
     Arena_Region *start, *end;
 };
 
-typedef struct Array_Header Array_Header;
-struct Array_Header {
+typedef struct List_Header List_Header;
+struct List_Header {
     size_t size;
     size_t stride;
 };
@@ -36,9 +36,9 @@ extern void *arena_alloc(Arena *a, size_t bytes);
 extern void *arena_realloc(Arena *a, void *ptr, size_t old_size, size_t new_size);
 extern void arena_free(Arena *a);
 
-extern size_t array_get_size(void *array);
-extern size_t array_get_stride(void *array);
-/* TODO: add array_resize */
+extern size_t list_get_size(void *list);
+extern size_t list_get_stride(void *list);
+/* TODO: add list_resize */
 
 #endif /* UTIL_H_ */
 
@@ -104,22 +104,22 @@ void arena_free(Arena *a) {
     a->start = a->end = NULL;
 }
 
-void *internal_array_create(Arena *a, size_t size, size_t stride) {
-    size_t allocd_size = sizeof(Array_Header) + (size * stride);
-    void *array = arena_alloc(a, allocd_size);
-    Array_Header *header = (Array_Header *)array;
+void *internal_list_create(Arena *a, size_t size, size_t stride) {
+    size_t allocd_size = sizeof(List_Header) + (size * stride);
+    void *list = arena_alloc(a, allocd_size);
+    List_Header *header = (List_Header *)list;
     header->size = size;
     header->stride = stride;
-    return (char *)array + sizeof(Array_Header);
+    return (char *)list + sizeof(List_Header);
 }
 
-size_t array_get_size(void *array) {
-    Array_Header *header = (Array_Header *)array - 1;
+size_t list_get_size(void *list) {
+    List_Header *header = (List_Header *)list - 1;
     return header->size;
 }
 
-size_t array_get_stride(void *array) {
-    Array_Header *header = (Array_Header *)array - 1;
+size_t list_get_stride(void *list) {
+    List_Header *header = (List_Header *)list - 1;
     return header->stride;
 }
 
