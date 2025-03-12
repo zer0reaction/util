@@ -7,7 +7,7 @@
 
 #ifndef ARENA_REGION_DEFAULT_CAPACITY
 #define ARENA_REGION_DEFAULT_CAPACITY (8*1024)
-#endif // ARENA_REGION_DEFAULT_CAPACITY
+#endif /* ARENA_REGION_DEFAULT_CAPACITY */
 
 #define UTIL_MAX(a, b) ((a > b) ? a : b)
 
@@ -38,9 +38,9 @@ extern void arena_free(Arena *a);
 
 extern size_t array_get_size(void *array);
 extern size_t array_get_stride(void *array);
-// TODO: add array_resize
+/* TODO: add array_resize */
 
-#endif // UTIL_H_
+#endif /* UTIL_H_ */
 
 #ifdef UTIL_IMPLEMENTATION
 
@@ -76,12 +76,15 @@ void *arena_alloc(Arena *a, size_t bytes) {
 }
 
 void *arena_realloc(Arena *a, void *ptr, size_t old_size, size_t new_size) {
+    size_t i;
+    char *new_ptr, *ptr_char, *new_ptr_char;
+
     if (new_size <= old_size) return ptr;
 
-    char *new_ptr = arena_alloc(a, new_size);
-    char *ptr_char = (char *)ptr;
-    char *new_ptr_char = (char *)new_ptr;
-    for (size_t i = 0; i < old_size; ++i) {
+    new_ptr = arena_alloc(a, new_size);
+    ptr_char = (char *)ptr;
+    new_ptr_char = (char *)new_ptr;
+    for (i = 0; i < old_size; ++i) {
         new_ptr_char[i] = ptr_char[i];
     }
 
@@ -103,12 +106,10 @@ void arena_free(Arena *a) {
 
 void *internal_array_create(Arena *a, size_t size, size_t stride) {
     size_t allocd_size = sizeof(Array_Header) + (size * stride);
-
     void *array = arena_alloc(a, allocd_size);
     Array_Header *header = (Array_Header *)array;
     header->size = size;
     header->stride = stride;
-
     return (char *)array + sizeof(Array_Header);
 }
 
@@ -123,4 +124,4 @@ size_t array_get_stride(void *array) {
 }
 
 #undef UTIL_IMPLEMENTATION
-#endif // UTIL_IMPLEMENTATION
+#endif /* UTIL_IMPLEMENTATION */
