@@ -29,6 +29,7 @@
 #endif /* ARENA_REGION_SCALE_FACTOR */
 
 #define UTIL_MAX(a, b) ((a > b) ? a : b)
+#define LIST_HEADER(list) ((List_Header *)list - 1)
 
 #define list_create(arena, T, size) internal_list_create(arena, size, sizeof(T))
 
@@ -256,12 +257,12 @@ void arena_free(Arena *a) {
 }
 
 size_t list_get_size(void *list) {
-    List_Header *header = (List_Header *)list - 1;
+    List_Header *header = LIST_HEADER(list);
     return header->size;
 }
 
 size_t list_get_stride(void *list) {
-    List_Header *header = (List_Header *)list - 1;
+    List_Header *header = LIST_HEADER(list);
     return header->stride;
 }
 
