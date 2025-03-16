@@ -24,9 +24,9 @@
     #define ARENA_REGION_DEFAULT_CAPACITY (8*1024)
 #endif /* ARENA_REGION_DEFAULT_CAPACITY */
 
-#ifndef ARENA_REGION_REALLOC_FACTOR
-    #define ARENA_REGION_REALLOC_FACTOR (2)
-#endif /* ARENA_REGION_REALLOC_FACTOR */
+#ifndef ARENA_REGION_SCALE_FACTOR
+    #define ARENA_REGION_SCALE_FACTOR (2)
+#endif /* ARENA_REGION_SCALE_FACTOR */
 
 #define UTIL_MAX(a, b) ((a > b) ? a : b)
 
@@ -70,7 +70,7 @@ Arena_Region *internal_arena_region_create(size_t bytes) {
     size_t region_capacity;
 
     r = malloc(sizeof(Arena_Region));
-    region_capacity = UTIL_MAX(ARENA_REGION_DEFAULT_CAPACITY, bytes);
+    region_capacity = UTIL_MAX(ARENA_REGION_DEFAULT_CAPACITY, bytes * ARENA_REGION_SCALE_FACTOR);
 
     r->next = NULL;
     r->capacity = region_capacity;
@@ -88,7 +88,7 @@ Arena_Region *internal_arena_region_create_reallocatable(size_t bytes) {
     size_t region_capacity;
 
     r = malloc(sizeof(Arena_Region));
-    region_capacity = bytes * ARENA_REGION_REALLOC_FACTOR;
+    region_capacity = bytes * ARENA_REGION_SCALE_FACTOR;
 
     r->next = NULL;
     r->capacity = region_capacity;
