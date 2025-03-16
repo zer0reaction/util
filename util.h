@@ -124,25 +124,25 @@ Arena_Region *internal_get_ptr_region(Arena *a, void *ptr) {
     return NULL;
 }
 
-void internal_arena_region_push_back(Arena *a, Arena_Region *r) {
+void internal_arena_region_push(Arena *a, Arena_Region *r) {
     if (a->start == NULL) {
-        UTIL_DEBUG_INFO(("Pushing back regular region to an empty arena"));
+        UTIL_DEBUG_INFO(("Pushing regular region to an empty arena"));
         a->start = a->end = r;
     } else {
-        UTIL_DEBUG_INFO(("Pushing back regular region"));
-        a->end->next = r;
-        a->end = a->end->next;
+        UTIL_DEBUG_INFO(("Pushing regular region"));
+        r->next = a->start;
+        a->start = r;
     }
 }
 
-void internal_arena_region_push_back_reallocatable(Arena *a, Arena_Region *r) {
+void internal_arena_region_push_reallocatable(Arena *a, Arena_Region *r) {
     if (a->start_reallocatable == NULL) {
-        UTIL_DEBUG_INFO(("Pushing back reallocatable region to an empty arena"));
+        UTIL_DEBUG_INFO(("Pushing reallocatable region to an empty arena"));
         a->start_reallocatable = a->end_reallocatable = r;
     } else {
-        UTIL_DEBUG_INFO(("Pushing back reallocatable region"));
-        a->end_reallocatable->next = r;
-        a->end_reallocatable = a->end_reallocatable->next;
+        UTIL_DEBUG_INFO(("Pushing reallocatable region"));
+        r->next = a->start_reallocatable;
+        a->start_reallocatable = r;
     }
 }
 
@@ -176,7 +176,7 @@ void *arena_alloc(Arena *a, size_t bytes) {
         UTIL_DEBUG_INFO(("Creating a new region and allocating %ld bytes on it", bytes));
 
         r = internal_arena_region_create(bytes);
-        internal_arena_region_push_back(a, r);
+        internal_arena_region_push(a, r);
         return r->data;
     }
 
@@ -214,7 +214,7 @@ void *arena_realloc(Arena *a, void *ptr, size_t old_size, size_t new_size) {
         for (i = 0; i < old_size; ++i) {
             ((char *)new_region->data)[i] = ((char *)ptr)[i];
         }
-        internal_arena_region_push_back_reallocatable(a, new_region);
+        internal_arena_region_push_reallocatable(a, new_region);
 
         return new_region->data;
     }
