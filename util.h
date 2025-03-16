@@ -126,7 +126,7 @@ Arena_Region *internal_get_ptr_region(Arena *a, void *ptr) {
 
 void internal_arena_region_push(Arena *a, Arena_Region *r) {
     if (a->start == NULL) {
-        UTIL_DEBUG_INFO(("Pushing regular region to an empty arena"));
+        UTIL_DEBUG_INFO(("Pushing regular region to an empty list"));
         a->start = a->end = r;
     } else {
         UTIL_DEBUG_INFO(("Pushing regular region"));
@@ -137,7 +137,7 @@ void internal_arena_region_push(Arena *a, Arena_Region *r) {
 
 void internal_arena_region_push_reallocatable(Arena *a, Arena_Region *r) {
     if (a->start_reallocatable == NULL) {
-        UTIL_DEBUG_INFO(("Pushing reallocatable region to an empty arena"));
+        UTIL_DEBUG_INFO(("Pushing reallocatable region to an empty list"));
         a->start_reallocatable = a->end_reallocatable = r;
     } else {
         UTIL_DEBUG_INFO(("Pushing reallocatable region"));
@@ -207,7 +207,7 @@ void *arena_realloc(Arena *a, void *ptr, size_t old_size, size_t new_size) {
     if (!ptr_region->reallocatable || new_size > ptr_region->capacity) {
         Arena_Region *new_region;
 
-        UTIL_DEBUG_INFO(("Region is not reallocatable or there is not enough free space, creating a new one of size %ld", new_size));
+        UTIL_DEBUG_INFO(("Region is not reallocatable or there is not enough free space, creating a new one and allocating %ld bytes on it", new_size));
 
         new_region = internal_arena_region_create_reallocatable(new_size);
 
