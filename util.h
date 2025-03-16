@@ -231,7 +231,7 @@ void arena_free(Arena *a) {
     while (r != NULL) {
         Arena_Region *next_region;
 
-        UTIL_DEBUG_INFO(("Freeing regular region"));
+        UTIL_DEBUG_INFO(("Freeing regular region of size %ld", r->capacity));
 
         next_region = r->next;
         free(r->data);
@@ -243,7 +243,7 @@ void arena_free(Arena *a) {
     while (r != NULL) {
         Arena_Region *next_region;
 
-        UTIL_DEBUG_INFO(("Freeing reallocatable region"));
+        UTIL_DEBUG_INFO(("Freeing reallocatable region of size %ld", r->capacity));
         
         next_region = r->next;
         free(r->data);
