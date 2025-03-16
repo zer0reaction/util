@@ -24,9 +24,13 @@
     #define ARENA_REGION_DEFAULT_CAPACITY (8*1024)
 #endif /* ARENA_REGION_DEFAULT_CAPACITY */
 
-#ifndef ARENA_REGION_SCALE_FACTOR
-    #define ARENA_REGION_SCALE_FACTOR (2)
-#endif /* ARENA_REGION_SCALE_FACTOR */
+#ifndef ARENA_REGION_REALLOC_FACTOR
+    #define ARENA_REGION_REALLOC_FACTOR (2)
+#endif /* ARENA_REGION_REALLOC_FACTOR */
+
+#ifndef ARENA_REGION_ALLOC_FACTOR
+    #define ARENA_REGION_ALLOC_FACTOR (1.25)
+#endif /* ARENA_REGION_ALLOC_FACTOR */
 
 #define UTIL_MAX(a, b) ((a > b) ? a : b)
 #define LIST_HEADER(list) ((List_Header *)list - 1)
@@ -71,7 +75,7 @@ Arena_Region *internal_arena_region_create(size_t bytes) {
     size_t region_capacity;
 
     r = malloc(sizeof(Arena_Region));
-    region_capacity = UTIL_MAX(ARENA_REGION_DEFAULT_CAPACITY, bytes * ARENA_REGION_SCALE_FACTOR);
+    region_capacity = UTIL_MAX(ARENA_REGION_DEFAULT_CAPACITY, bytes * ARENA_REGION_ALLOC_FACTOR);
 
     r->next = NULL;
     r->capacity = region_capacity;
@@ -89,7 +93,7 @@ Arena_Region *internal_arena_region_create_reallocatable(size_t bytes) {
     size_t region_capacity;
 
     r = malloc(sizeof(Arena_Region));
-    region_capacity = bytes * ARENA_REGION_SCALE_FACTOR;
+    region_capacity = bytes * ARENA_REGION_REALLOC_FACTOR;
 
     r->next = NULL;
     r->capacity = region_capacity;
@@ -201,7 +205,7 @@ void *arena_realloc(Arena *a, void *ptr, size_t old_size, size_t new_size) {
     ptr_region = internal_get_ptr_region(a, ptr);
 
     if (ptr == NULL || ptr_region == NULL) {
-        UTIL_DEBUG_INFO(("Passed a NULL or invalid ptr to arena_realloc, allocating a new region of size %ld", new_size));
+        UTIL_DEBUG_INFO(("Passed a NULL or invalid ptr to arena_realloc, creating a new one and allocating %ld bytes on it", new_size));
         return arena_alloc(a, new_size);
     }
 
