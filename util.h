@@ -3,7 +3,6 @@
 
 #include <stddef.h>
 #include <stdlib.h>
-#include <stdint.h>
 
 #ifdef UTIL_DEBUG
     #include <stdio.h>
@@ -67,7 +66,7 @@ extern void arena_free(Arena *a);
 
 extern size_t list_get_size(void *list);
 extern size_t list_get_stride(void *list);
-/* TODO: add list_resize */
+extern
 
 #endif /* UTIL_H_ */
 
