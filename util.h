@@ -32,6 +32,7 @@
 
 #define UTIL_MAX(a, b) ((a > b) ? a : b)
 #define LIST_HEADER(list) ((List_Header *)list - 1)
+#define LIST_BODY(header) ((char *)header + sizeof(List_Header))
 
 typedef unsigned char bool;
 #define true 1
@@ -65,6 +66,13 @@ extern void arena_free(Arena *a);
 #define list_create(arena, T, size) internal_list_create(arena, size, sizeof(T))
 extern size_t list_get_size(void *list);
 extern size_t list_get_stride(void *list);
+#define list_push_back(arena, list, value) do {        \
+  size_t new_size;                                     \
+                                                       \
+  new_size = list_get_size(list) + 1;                  \
+  list = internal_list_resize(arena, list, new_size);  \
+  list[new_size - 1] = value;                          \
+} while (0)
 
 Arena_Region *internal_arena_region_create(size_t bytes);
 Arena_Region *internal_arena_region_create_reallocatable(size_t bytes);
@@ -72,6 +80,7 @@ Arena_Region *internal_get_ptr_region(Arena *a, void *ptr);
 void internal_arena_region_push(Arena *a, Arena_Region *r);
 void internal_arena_region_push_reallocatable(Arena *a, Arena_Region *r);
 void *internal_list_create(Arena *a, size_t size, size_t stride);
+void *internal_list_resize(Arena *a, void *list, size_t new_size);
 
 #endif /* UTIL_H_ */
 
@@ -118,16 +127,16 @@ Arena_Region *internal_get_ptr_region(Arena *a, void *ptr) {
 
   r = a->start_reallocatable;
   while (r != NULL) {
-    if (ptr == r->data) return r;
     UTIL_DEBUG_INFO(("Going through reallocatable regions..."));
+    if (ptr == r->data) return r;
     r = r->next;
   }
   UTIL_DEBUG_INFO(("Searching for ptr in reallocatable regions failed, trying in regular"));
 
   r = a->start;
   while (r != NULL) {
-    if (ptr >= r->data && (char *)ptr < (char *)(r->data) + r->capacity) return r;
     UTIL_DEBUG_INFO(("Going through regular regions..."));
+    if (ptr >= r->data && (char *)ptr < (char *)(r->data) + r->capacity) return r;
     r = r->next;
   }
   UTIL_DEBUG_INFO(("Searching for ptr in regular regions failed"));
@@ -159,18 +168,34 @@ void internal_arena_region_push_reallocatable(Arena *a, Arena_Region *r) {
 
 void *internal_list_create(Arena *a, size_t size, size_t stride) {
   size_t allocd_size;
-  void *list;
   List_Header *header;
 
   UTIL_DEBUG_INFO(("Creating list of size %ld and stride %ld", size, stride));
 
   allocd_size = sizeof(List_Header) + (size * stride);
-  list = arena_alloc(a, allocd_size);
-  header = (List_Header *)list;
+  header = arena_alloc(a, allocd_size);
   header->size = size;
   header->stride = stride;
 
-  return (char *)list + sizeof(List_Header);
+  return LIST_BODY(header);
+}
+
+void *internal_list_resize(Arena *a, void *list, size_t new_size) {
+  List_Header *header;
+  size_t old_alloc_size, new_alloc_size;
+
+  header = LIST_HEADER(list);
+  old_alloc_size = sizeof(List_Header) + header->size * header->stride;
+  new_alloc_size = sizeof(List_Header) + new_size * header->stride;
+
+  UTIL_DEBUG_INFO(("Resizing list %ld -> %ld (%ld to %ld bytes)", header->size, new_size, old_alloc_size, new_alloc_size));
+
+  if (new_alloc_size > old_alloc_size) {
+    header = arena_realloc(a, header, old_alloc_size, new_alloc_size);
+  }
+
+  header->size = new_size;
+  return LIST_BODY(header);
 }
 
 void *arena_alloc(Arena *a, size_t bytes) {
@@ -183,8 +208,6 @@ void *arena_alloc(Arena *a, size_t bytes) {
 
   if (a->start == NULL || a->start->used + bytes > a->start->capacity) {
     Arena_Region *r;
-
-    UTIL_DEBUG_INFO(("There are no regions yet or not enough space in the start region, creating a new one and allocating %ld bytes on it", bytes));
 
     r = internal_arena_region_create(bytes);
     internal_arena_region_push(a, r);
@@ -207,18 +230,14 @@ void *arena_realloc(Arena *a, void *ptr, size_t old_size, size_t new_size) {
     return realloc(ptr, new_size);
   }
 
-  UTIL_DEBUG_INFO(("Searching for pointer in regions (arena_realloc)"));
   ptr_region = internal_get_ptr_region(a, ptr);
 
   if (ptr == NULL || ptr_region == NULL) {
-    UTIL_DEBUG_INFO(("Passed a NULL or invalid ptr to arena_realloc, creating a new one and allocating %ld bytes on it", new_size));
     return arena_alloc(a, new_size);
   }
 
   if (!ptr_region->reallocatable || new_size > ptr_region->capacity) {
     Arena_Region *new_region;
-
-    UTIL_DEBUG_INFO(("Region is not reallocatable or there is not enough free space, creating a new one and allocating %ld bytes on it", new_size));
 
     new_region = internal_arena_region_create_reallocatable(new_size);
 
@@ -267,12 +286,16 @@ void arena_free(Arena *a) {
 }
 
 size_t list_get_size(void *list) {
-  List_Header *header = LIST_HEADER(list);
+  List_Header *header;
+
+  header = LIST_HEADER(list);
   return header->size;
 }
 
 size_t list_get_stride(void *list) {
-  List_Header *header = LIST_HEADER(list);
+  List_Header *header;
+
+  header = LIST_HEADER(list);
   return header->stride;
 }
 
