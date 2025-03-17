@@ -33,8 +33,6 @@
 #define UTIL_MAX(a, b) ((a > b) ? a : b)
 #define LIST_HEADER(list) ((List_Header *)list - 1)
 
-#define list_create(arena, T, size) internal_list_create(arena, size, sizeof(T))
-
 typedef unsigned char bool;
 #define true 1
 #define false 0
@@ -64,9 +62,16 @@ extern void *arena_alloc(Arena *a, size_t bytes);
 extern void *arena_realloc(Arena *a, void *ptr, size_t old_size, size_t new_size);
 extern void arena_free(Arena *a);
 
+#define list_create(arena, T, size) internal_list_create(arena, size, sizeof(T))
 extern size_t list_get_size(void *list);
 extern size_t list_get_stride(void *list);
-extern
+
+Arena_Region *internal_arena_region_create(size_t bytes);
+Arena_Region *internal_arena_region_create_reallocatable(size_t bytes);
+Arena_Region *internal_get_ptr_region(Arena *a, void *ptr);
+void internal_arena_region_push(Arena *a, Arena_Region *r);
+void internal_arena_region_push_reallocatable(Arena *a, Arena_Region *r);
+void *internal_list_create(Arena *a, size_t size, size_t stride);
 
 #endif /* UTIL_H_ */
 
