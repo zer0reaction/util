@@ -79,5 +79,19 @@ void *internal_list_resize(Arena *a, void *list, size_t new_size) {
   return UTIL_LIST_BODY(header);
 }
 
+size_t list_get_size(void *list) {
+  List_Header *header;
+
+  header = UTIL_LIST_HEADER(list);
+  return header->size;
+}
+
+size_t list_get_stride(void *list) {
+  List_Header *header;
+
+  header = UTIL_LIST_HEADER(list);
+  return header->stride;
+}
+
 #undef UTIL_LIST_IMPLEMENTATION
 #endif /* UTIL_LIST_IMPLEMENTATION */
