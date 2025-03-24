@@ -1,23 +1,6 @@
-typedef unsigned char bool;
-#define true 1
-#define false 0
-
-typedef char i8;
-typedef short int i16;
-typedef int i32;
-typedef long int i64;
-
-typedef unsigned char u8;
-typedef unsigned short int u16;
-typedef unsigned int u32;
-typedef unsigned long int u64;
-
-typedef float f32;
-typedef double f64;
-
-typedef unsigned char c8;
-typedef unsigned short int c16;
-
+#define UTIL_DEBUG
+#include "typedef.h"
+#include "debuginfo.h"
 #include <assert.h>
 
 int main(void) {
@@ -36,6 +19,8 @@ int main(void) {
 
   assert(sizeof(c8) == 1);
   assert(sizeof(c16) == 2);
+
+  UTIL_DEBUG_INFO("sizecheck", ("All types match their sizes"));
 
   return 0;
 }
