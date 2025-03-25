@@ -39,6 +39,7 @@ extern size_t list_get_stride(void *list);
   list = internal_list_resize(arena, list, new_size);  \
   list[new_size - 1] = value;                          \
 } while (0)
+#define list_pop_back(list) (list[--(UTIL_LIST_HEADER(list)->size)])
 
 void *internal_list_create(Arena *a, size_t size, size_t stride);
 void *internal_list_resize(Arena *a, void *list, size_t new_size);
