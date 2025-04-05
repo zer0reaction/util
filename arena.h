@@ -1,7 +1,6 @@
 #ifndef ARENA_H_
 #define ARENA_H_
 
-#include <stddef.h>
 #include <stdlib.h>
 
 #include "typedef.h"
