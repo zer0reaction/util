@@ -39,7 +39,7 @@ struct Arena_Region {
     size_t capacity;
     size_t used;
     void *data;
-    bool reallocatable;
+    util_bool reallocatable;
 };
 
 typedef struct Arena Arena;
@@ -73,7 +73,7 @@ Arena_Region *internal_arena_region_create(size_t bytes) {
     r->capacity = region_capacity;
     r->used = bytes;
     r->data = malloc(region_capacity);
-    r->reallocatable = false;
+    r->reallocatable = util_false;
 
     ARENA_DEBUG_INFO(("Created regular region, %ld/%ld", r->used, r->capacity));
 
@@ -91,7 +91,7 @@ Arena_Region *internal_arena_region_create_reallocatable(size_t bytes) {
     r->capacity = region_capacity;
     r->used = bytes;
     r->data = malloc(region_capacity);
-    r->reallocatable = true;
+    r->reallocatable = util_true;
 
     ARENA_DEBUG_INFO(("Created reallocatable region, %ld/%ld", r->used, r->capacity));
 
