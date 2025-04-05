@@ -1,4 +1,4 @@
-#define UTIL_DEBUG
+#define DEBUG
 #include "typedef.h"
 #include "debuginfo.h"
 #include <assert.h>
@@ -20,7 +20,7 @@ int main(void) {
   assert(sizeof(c8) == 1);
   assert(sizeof(c16) == 2);
 
-  UTIL_DEBUG_INFO("sizecheck", ("All types match their sizes"));
+  DEBUG_INFO("sizecheck", ("All types match their sizes"));
 
   return 0;
 }

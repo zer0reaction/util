@@ -1,9 +1,9 @@
-#ifndef UTIL_TYPEDEF_H_
-#define UTIL_TYPEDEF_H_
+#ifndef TYPEDEF_H_
+#define TYPEDEF_H_
 
-typedef unsigned char Util_Bool;
-#define UTIL_TRUE (1)
-#define UTIL_FALSE (0)
+typedef unsigned char bool;
+#define true (1)
+#define false (0)
 
 typedef char i8;
 typedef short int i16;
@@ -21,4 +21,4 @@ typedef double f64;
 typedef unsigned char c8;
 typedef unsigned short int c16;
 
-#endif /* UTIL_TYPEDEF_H_ */
+#endif /* TYPEDEF_H_ */
