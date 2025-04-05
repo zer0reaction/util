@@ -30,14 +30,14 @@ struct Da_Header {
 };
 
 #define da_create(arena, T, size) internal_da_create(arena, size, sizeof(T))
-extern size_t da_get_size(void *da);
-extern size_t da_get_stride(void *da);
-#define da_push_back(arena, da, value) do {         \
-    size_t new_size;                                    \
-                                                        \
-    new_size = da_get_size(da) + 1;                 \
+extern size_t da_size(void *da);
+extern size_t da_stride(void *da);
+#define da_push_back(arena, da, value) do {       \
+    size_t new_size;                              \
+                                                  \
+    new_size = da_size(da) + 1;                   \
     da = internal_da_resize(arena, da, new_size); \
-    da[new_size - 1] = value;                         \
+    da[new_size - 1] = value;                     \
 } while (0)
 #define da_pop_back(da) (da[--(DA_HEADER(da)->size)])
 
@@ -80,14 +80,14 @@ void *internal_da_resize(Arena *a, void *da, size_t new_size) {
     return DA_BODY(header);
 }
 
-size_t da_get_size(void *da) {
+size_t da_size(void *da) {
     Da_Header *header;
 
     header = DA_HEADER(da);
     return header->size;
 }
 
-size_t da_get_stride(void *da) {
+size_t da_stride(void *da) {
     Da_Header *header;
 
     header = DA_HEADER(da);
