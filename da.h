@@ -2,6 +2,7 @@
 #define DA_H_
 
 #include <stddef.h>
+#include <assert.h>
 
 #include "typedef.h"
 #include "arena.h"
@@ -25,8 +26,6 @@
 
 #define da_create(arena, T, size) internal_da_create(arena, size, sizeof(T))
 
-/* TODO: add runtime bounds check */
-
 #define da_push_back(arena, da, value) do {       \
     size_t new_size;                              \
     new_size = da_size(da) + 1;                   \
@@ -34,20 +33,22 @@
     da[new_size - 1] = value;                     \
 } while (0)
 
-#define da_pop_back(arena, da) do {               \
-    size_t new_size;                              \
-    new_size = da_size(da) - 1;                   \
-    da = internal_da_resize(arena, da, new_size); \
+#define da_pop_back(arena, da) do {                         \
+    size_t new_size;                                        \
+    assert(da_size(da) > 0 && "da_pop_back: invalid size"); \
+    new_size = da_size(da) - 1;                             \
+    da = internal_da_resize(arena, da, new_size);           \
 } while (0)
 
-#define da_insert(arena, da, pos, value) do {     \
-    size_t i, new_size;                           \
-    new_size = da_size(da) + 1;                   \
-    da = internal_da_resize(arena, da, new_size); \
-    for (i = new_size - 1; i > pos; --i) {        \
-        da[i] = da[i - 1];                        \
-    }                                             \
-    da[pos] = value;                              \
+#define da_insert(arena, da, pos, value) do {                        \
+    size_t i, new_size;                                              \
+    new_size = da_size(da) + 1;                                      \
+    assert(pos >= 0 && pos < new_size && "da_insert: invalid size"); \
+    da = internal_da_resize(arena, da, new_size);                    \
+    for (i = new_size - 1; i > pos; --i) {                           \
+        da[i] = da[i - 1];                                           \
+    }                                                                \
+    da[pos] = value;                                                 \
 } while (0)
 
 typedef struct Da_Header Da_Header;
