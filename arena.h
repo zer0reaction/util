@@ -103,29 +103,23 @@ Arena_Region *internal_get_ptr_region(Arena *a, void *ptr) {
 
     r = a->start_reallocatable;
     while (r != NULL) {
-        ARENA_DEBUG_INFO(("Going through reallocatable regions..."));
         if (ptr == r->data) return r;
         r = r->next;
     }
-    ARENA_DEBUG_INFO(("Searching for ptr in reallocatable regions failed, trying in regular"));
 
     r = a->start;
     while (r != NULL) {
-        ARENA_DEBUG_INFO(("Going through regular regions..."));
         if (ptr >= r->data && (char *)ptr < (char *)(r->data) + r->capacity) return r;
         r = r->next;
     }
-    ARENA_DEBUG_INFO(("Searching for ptr in regular regions failed"));
 
     return NULL;
 }
 
 void internal_arena_region_push(Arena *a, Arena_Region *r) {
     if (a->start == NULL) {
-        ARENA_DEBUG_INFO(("Pushing regular region to an empty list"));
         a->start = r;
     } else {
-        ARENA_DEBUG_INFO(("Pushing regular region"));
         r->next = a->start;
         a->start = r;
     }
@@ -133,10 +127,8 @@ void internal_arena_region_push(Arena *a, Arena_Region *r) {
 
 void internal_arena_region_push_reallocatable(Arena *a, Arena_Region *r) {
     if (a->start_reallocatable == NULL) {
-        ARENA_DEBUG_INFO(("Pushing reallocatable region to an empty list"));
         a->start_reallocatable = r;
     } else {
-        ARENA_DEBUG_INFO(("Pushing reallocatable region"));
         r->next = a->start_reallocatable;
         a->start_reallocatable = r;
     }
