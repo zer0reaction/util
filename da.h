@@ -23,23 +23,41 @@
 #define DA_HEADER(da) ((Da_Header *)da - 1)
 #define DA_BODY(header) ((char *)header + sizeof(Da_Header))
 
+#define da_create(arena, T, size) internal_da_create(arena, size, sizeof(T))
+
+/* TODO: add runtime bounds check */
+
+#define da_push_back(arena, da, value) do {       \
+    size_t new_size;                              \
+    new_size = da_size(da) + 1;                   \
+    da = internal_da_resize(arena, da, new_size); \
+    da[new_size - 1] = value;                     \
+} while (0)
+
+#define da_pop_back(arena, da) do {               \
+    size_t new_size;                              \
+    new_size = da_size(da) - 1;                   \
+    da = internal_da_resize(arena, da, new_size); \
+} while (0)
+
+#define da_insert(arena, da, pos, value) do {     \
+    size_t i, new_size;                           \
+    new_size = da_size(da) + 1;                   \
+    da = internal_da_resize(arena, da, new_size); \
+    for (i = new_size - 1; i > pos; --i) {        \
+        da[i] = da[i - 1];                        \
+    }                                             \
+    da[pos] = value;                              \
+} while (0)
+
 typedef struct Da_Header Da_Header;
 struct Da_Header {
     size_t size;
     size_t stride;
 };
 
-#define da_create(arena, T, size) internal_da_create(arena, size, sizeof(T))
 extern size_t da_size(void *da);
 extern size_t da_stride(void *da);
-#define da_push_back(arena, da, value) do {       \
-    size_t new_size;                              \
-                                                  \
-    new_size = da_size(da) + 1;                   \
-    da = internal_da_resize(arena, da, new_size); \
-    da[new_size - 1] = value;                     \
-} while (0)
-#define da_pop_back(da) (da[--(DA_HEADER(da)->size)])
 
 void *internal_da_create(Arena *a, size_t size, size_t stride);
 void *internal_da_resize(Arena *a, void *da, size_t new_size);
