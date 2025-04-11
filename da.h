@@ -3,6 +3,7 @@
 
 #include <stddef.h>
 #include <assert.h>
+#include <string.h>
 
 #include "arena.h"
 
@@ -111,8 +112,19 @@ size_t da_stride(void *da) {
 }
 
 void da_pop_back(void *da) {
-    assert(da_size(da) > 0 && "da_pop_back: invalid size"); \
-    DA_HEADER(da)->size--;                                  \
+    assert(da_size(da) > 0 && "da_pop_back: invalid size");
+    DA_HEADER(da)->size--;
+}
+
+void *da_clone(Arena *a, void *orig) {
+    Da_Header *head;
+    void *clone;
+
+    head = DA_HEADER(orig);
+    clone = internal_da_create(a, head->size, head->stride);
+    memcpy(clone, orig, head->size * head->stride);
+
+    return clone;
 }
 
 #undef DA_IMPLEMENTATION
