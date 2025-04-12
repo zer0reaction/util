@@ -20,31 +20,35 @@
     da[new_size - 1] = value;              \
 } while (0)
 
-#define da_push(da, pos, value) do {                              \
-    size_t i, new_size;                                           \
-                                                                  \
-    new_size = da_size(da) + 1;                                   \
-    assert(pos >= 0 && pos < new_size && "da_push: invalid pos"); \
-                                                                  \
-    da = internal_da_resize(da, new_size);                        \
-    for (i = new_size - 1; i > pos; --i) {                        \
-        da[i] = da[i - 1];                                        \
-    }                                                             \
-                                                                  \
-    da[pos] = value;                                              \
+#define da_push(da, _pos, value) do {                 \
+    size_t i, new_size, pos;                          \
+                                                      \
+    pos = _pos;                                       \
+                                                      \
+    new_size = da_size(da) + 1;                       \
+    assert(pos < new_size && "da_push: invalid pos"); \
+                                                      \
+    da = internal_da_resize(da, new_size);            \
+    for (i = new_size - 1; i > pos; --i) {            \
+        da[i] = da[i - 1];                            \
+    }                                                 \
+                                                      \
+    da[pos] = value;                                  \
 } while (0)
 
-#define da_pop(da, pos) do {                                 \
-    size_t i, size;                                          \
-                                                             \
-    size = da_size(da);                                      \
-    assert(pos >= 0 && pos < size && "da_pop: invalid pos"); \
-                                                             \
-    for (i = pos; i < size - 1; ++i) {                       \
-        da[i] = da[i + 1];                                   \
-    }                                                        \
-                                                             \
-    DA_HEADER(da)->size--;                                   \
+#define da_pop(da, _pos) do {                    \
+    size_t i, size, pos;                         \
+                                                 \
+    pos = _pos;                                  \
+                                                 \
+    size = da_size(da);                          \
+    assert(pos < size && "da_pop: invalid pos"); \
+                                                 \
+    for (i = pos; i < size - 1; ++i) {           \
+        da[i] = da[i + 1];                       \
+    }                                            \
+                                                 \
+    DA_HEADER(da)->size--;                       \
 } while (0)
 
 typedef struct Da_Header Da_Header;
