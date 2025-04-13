@@ -36,7 +36,8 @@
     da[pos] = value;                                  \
 } while (0)
 
-/* rewrite as a function with memmove */
+/* TODO: rewrite as a function with memmove */
+/* also add void * where the return value will be stored */
 #define da_pop(da, _pos) do {                    \
     size_t i, size, pos;                         \
                                                  \
@@ -119,6 +120,7 @@ size_t da_stride(void *da) {
     return header->stride;
 }
 
+/* TODO: add void * where the return value will be stored */
 void da_pop_back(void *da) {
     assert(da_size(da) > 0 && "da_pop_back: invalid size");
     DA_HEADER(da)->size--;
