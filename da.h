@@ -36,6 +36,7 @@
     da[pos] = value;                                  \
 } while (0)
 
+/* TODO: can turn this into function */
 #define da_pop(da, _pos) do {                    \
     size_t i, size, pos;                         \
                                                  \
@@ -62,6 +63,7 @@ extern size_t da_size(void *da);
 extern size_t da_stride(void *da);
 extern void da_pop_back(void *da);
 extern void *da_clone(Arena *a, void *orig);
+/* TODO: add da_append and da_insert */
 
 void *internal_da_create(Arena *a, size_t size, size_t stride);
 void *internal_da_resize(void *da, size_t new_size);
