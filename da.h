@@ -61,6 +61,7 @@ struct Da_Header {
 extern size_t da_size(void *da);
 extern size_t da_stride(void *da);
 extern void da_pop_back(void *da);
+extern void *da_clone(Arena *a, void *orig);
 
 void *internal_da_create(Arena *a, size_t size, size_t stride);
 void *internal_da_resize(void *da, size_t new_size);
