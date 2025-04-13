@@ -150,6 +150,7 @@ void da_append(void *dest, void *src) {
 }
 
 void da_insert(void *dest, void *src, size_t pos) {
+    void *mv_from, *mv_to;
     size_t src_sizeb;
     Da_Header *h_dest, *h_src;
 
@@ -161,8 +162,11 @@ void da_insert(void *dest, void *src, size_t pos) {
 
     internal_da_resize(dest, h_dest->size + h_src->size);
 
-    memmove((char *)dest + pos * h_dest->stride + src_sizeb, (char *)dest + pos * h_dest->stride, src_sizeb);
-    memcpy((char *)dest + pos * h_dest->stride, src, src_sizeb);
+    mv_from = (char *)dest + pos * h_dest->stride;
+    mv_to = (char *)mv_from + src_sizeb;
+
+    memmove(mv_to, mv_from, src_sizeb);
+    memcpy(mv_from, src, src_sizeb);
 }
 
 #undef DA_IMPLEMENTATION
