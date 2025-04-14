@@ -36,11 +36,11 @@
     da[pos] = value;                                  \
 } while (0)
 
-#define da_append(a, b) {         \
+#define da_append(a, b) do {      \
     a = internal_da_append(a, b); \
 } while (0)
 
-#define da_insert(a, b, n) {         \
+#define da_insert(a, b, n) do {      \
     a = internal_da_insert(a, b, n); \
 } while (0)
 
