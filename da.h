@@ -36,6 +36,14 @@
     da[pos] = value;                                  \
 } while (0)
 
+#define da_append(a, b) {         \
+    a = internal_da_append(a, b); \
+} while (0)
+
+#define da_insert(a, b, n) {         \
+    a = internal_da_insert(a, b, n); \
+} while (0)
+
 /* TODO: rewrite as a function with memmove */
 /* also add void * where the return value will be stored */
 #define da_pop(da, _pos) do {                    \
@@ -64,9 +72,9 @@ extern size_t da_size(void *da);
 extern size_t da_stride(void *da);
 extern void da_pop_back(void *da);
 extern void *da_clone(Arena *a, void *orig);
-extern void *da_append(void *dest, void *src);
-extern void *da_insert(void *dest, void *src, size_t pos);
 
+void *internal_da_append(void *dest, void *src);
+void *internal_da_insert(void *dest, void *src, size_t pos);
 void *internal_da_create(Arena *a, size_t size, size_t stride);
 void *internal_da_resize(void *da, size_t new_size);
 
@@ -139,7 +147,7 @@ void *da_clone(Arena *a, void *orig) {
     return clone;
 }
 
-void *da_append(void *dest, void *src) {
+void *internal_da_append(void *dest, void *src) {
     size_t old_sizeb;
     Da_Header *h_dest, *h_src;
 
@@ -153,7 +161,7 @@ void *da_append(void *dest, void *src) {
     return dest;
 }
 
-void *da_insert(void *dest, void *src, size_t pos) {
+void *internal_da_insert(void *dest, void *src, size_t pos) {
     void *mv_from, *mv_to;
     size_t src_sizeb;
     Da_Header *h_dest, *h_src;
