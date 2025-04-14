@@ -64,8 +64,8 @@ extern size_t da_size(void *da);
 extern size_t da_stride(void *da);
 extern void da_pop_back(void *da);
 extern void *da_clone(Arena *a, void *orig);
-extern void da_append(void *dest, void *src);
-extern void da_insert(void *dest, void *src, size_t pos);
+extern void *da_append(void *dest, void *src);
+extern void *da_insert(void *dest, void *src, size_t pos);
 
 void *internal_da_create(Arena *a, size_t size, size_t stride);
 void *internal_da_resize(void *da, size_t new_size);
@@ -74,6 +74,7 @@ void *internal_da_resize(void *da, size_t new_size);
 
 #ifdef DA_IMPLEMENTATION
 
+/* TODO: add memset */
 void *internal_da_create(Arena *a, size_t size, size_t stride) {
     size_t allocd_size;
     Da_Header *header;
@@ -137,7 +138,7 @@ void *da_clone(Arena *a, void *orig) {
     return clone;
 }
 
-void da_append(void *dest, void *src) {
+void *da_append(void *dest, void *src) {
     size_t old_sizeb;
     Da_Header *h_dest, *h_src;
 
@@ -145,11 +146,13 @@ void da_append(void *dest, void *src) {
     h_src = DA_HEADER(src);
     old_sizeb = h_dest->size * h_dest->stride;
 
-    internal_da_resize(dest, h_dest->size + h_src->size);
+    dest = internal_da_resize(dest, h_dest->size + h_src->size);
     memcpy((char *)dest + old_sizeb, src, h_src->size * h_src->stride);
+
+    return dest;
 }
 
-void da_insert(void *dest, void *src, size_t pos) {
+void *da_insert(void *dest, void *src, size_t pos) {
     void *mv_from, *mv_to;
     size_t src_sizeb;
     Da_Header *h_dest, *h_src;
@@ -160,13 +163,15 @@ void da_insert(void *dest, void *src, size_t pos) {
 
     assert(pos <= h_dest->size && "da_insert: invalid pos");
 
-    internal_da_resize(dest, h_dest->size + h_src->size);
+    dest = internal_da_resize(dest, h_dest->size + h_src->size);
 
     mv_from = (char *)dest + pos * h_dest->stride;
     mv_to = (char *)mv_from + src_sizeb;
 
     memmove(mv_to, mv_from, src_sizeb);
     memcpy(mv_from, src, src_sizeb);
+
+    return dest;
 }
 
 #undef DA_IMPLEMENTATION
