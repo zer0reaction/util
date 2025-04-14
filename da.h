@@ -1,7 +1,7 @@
 #ifndef DA_H_
 #define DA_H_
 
-#include <stddef.h>
+#include <stdlib.h>
 #include <assert.h>
 #include <string.h>
 
@@ -74,7 +74,6 @@ void *internal_da_resize(void *da, size_t new_size);
 
 #ifdef DA_IMPLEMENTATION
 
-/* TODO: add memset */
 void *internal_da_create(Arena *a, size_t size, size_t stride) {
     size_t allocd_size;
     Da_Header *header;
@@ -85,6 +84,8 @@ void *internal_da_create(Arena *a, size_t size, size_t stride) {
     header->arena = a;
     header->size = size;
     header->stride = stride;
+
+    memset(DA_BODY(header), 0, size * stride);
 
     return DA_BODY(header);
 }
