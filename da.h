@@ -174,6 +174,7 @@ void *internal_da_insert(void *dest, void *src, size_t pos) {
     mv_from = (char *)dest + pos * h_dest->stride;
     mv_to = (char *)mv_from + src_sizeb;
 
+    /* TODO: maybe rewrite this without memmove? */
     memmove(mv_to, mv_from, src_sizeb);
     memcpy(mv_from, src, src_sizeb);
 
