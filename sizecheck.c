@@ -1,6 +1,6 @@
 #define DEBUG
 #include "typedef.h"
-#include "debuginfo.h"
+#include "info.h"
 #include <assert.h>
 
 int main(void) {
@@ -20,7 +20,7 @@ int main(void) {
   assert(sizeof(c8) == 1);
   assert(sizeof(c16) == 2);
 
-  DEBUG_INFO("sizecheck", ("All types match their sizes"));
+  INFO("sizecheck", ("All types match their sizes"));
 
   return 0;
 }

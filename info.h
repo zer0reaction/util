@@ -1,15 +1,15 @@
-#ifndef DEBUGINFO_H_
-#define DEBUGINFO_H_
+#ifndef INFO_H_
+#define INFO_H_
 
-#ifdef DEBUG
+#ifdef ENABLE_INFO
     #include <stdio.h>
-    #define DEBUG_INFO(caller, info) do { \
+    #define INFO(caller, info) do { \
         printf("[%s] ", caller);               \
         printf info;                           \
         printf("\n");                          \
     } while (0)
 #else
-    #define DEBUG_INFO(caller, info)
-#endif
+    #define INFO(caller, info)
+#endif /* ENABLE_INFO */
 
-#endif /* DEBUGINFO_H_ */
+#endif /* INFO_H_ */
