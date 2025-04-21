@@ -79,7 +79,7 @@ Arena_Region *internal_arena_region_create(u64 bytes) {
     r->data = malloc(region_capacity);
     r->reallocatable = util_false;
 
-    ARENA_DEBUG_INFO(("Created regular region, %ld/%ld", r->used, r->capacity));
+    ARENA_DEBUG_INFO(("Created regular region, %lu/%lu", r->used, r->capacity));
 
     return r;
 }
@@ -97,7 +97,7 @@ Arena_Region *internal_arena_region_create_reallocatable(u64 bytes) {
     r->data = malloc(region_capacity);
     r->reallocatable = util_true;
 
-    ARENA_DEBUG_INFO(("Created reallocatable region, %ld/%ld", r->used, r->capacity));
+    ARENA_DEBUG_INFO(("Created reallocatable region, %lu/%lu", r->used, r->capacity));
 
     return r;
 }
@@ -142,7 +142,7 @@ void *arena_alloc(Arena *a, u64 bytes) {
     void *ptr;
 
     if (a == NULL) {
-        ARENA_DEBUG_INFO(("Arena pointer is NULL, allocating %ld bytes with malloc", bytes));
+        ARENA_DEBUG_INFO(("Arena pointer is NULL, allocating %lu bytes with malloc", bytes));
         return malloc(bytes);
     }
 
@@ -154,7 +154,7 @@ void *arena_alloc(Arena *a, u64 bytes) {
         return r->data;
     }
 
-    ARENA_DEBUG_INFO(("Allocating %ld bytes on an existing region", bytes));
+    ARENA_DEBUG_INFO(("Allocating %lu bytes on an existing region", bytes));
 
     ptr = (char *)a->start->data + a->start->used;
     a->start->used += bytes;
@@ -166,7 +166,7 @@ void *arena_realloc(Arena *a, void *ptr, u64 old_size, u64 new_size) {
     Arena_Region *ptr_region;
 
     if (a == NULL) {
-        ARENA_DEBUG_INFO(("Arena pointer is NULL, reallocating %ld bytes with realloc", new_size));
+        ARENA_DEBUG_INFO(("Arena pointer is NULL, reallocating %lu bytes with realloc", new_size));
         return realloc(ptr, new_size);
     }
 
@@ -189,7 +189,7 @@ void *arena_realloc(Arena *a, void *ptr, u64 old_size, u64 new_size) {
         return new_region->data;
     }
 
-    ARENA_DEBUG_INFO(("Reallocating %ld -> %ld", old_size, new_size));
+    ARENA_DEBUG_INFO(("Reallocating %lu -> %lu", old_size, new_size));
     ptr_region->used = new_size;
     return ptr;
 }
@@ -201,7 +201,7 @@ void arena_free(Arena *a) {
     while (r != NULL) {
         Arena_Region *next_region;
 
-        ARENA_DEBUG_INFO(("Freeing regular region (%ld/%ld)", r->used, r->capacity));
+        ARENA_DEBUG_INFO(("Freeing regular region (%lu/%lu)", r->used, r->capacity));
 
         next_region = r->next;
         free(r->data);
@@ -213,7 +213,7 @@ void arena_free(Arena *a) {
     while (r != NULL) {
         Arena_Region *next_region;
 
-        ARENA_DEBUG_INFO(("Freeing reallocatable region (%ld/%ld)", r->used, r->capacity));
+        ARENA_DEBUG_INFO(("Freeing reallocatable region (%lu/%lu)", r->used, r->capacity));
         
         next_region = r->next;
         free(r->data);
