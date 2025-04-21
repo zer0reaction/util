@@ -8,7 +8,7 @@
 #include "arena.h"
 
 #define DA_HEADER(da) ((Da_Header *)da - 1)
-#define DA_BODY(header) ((char *)header + sizeof(Da_Header))
+#define DA_BODY(header) (void *)((char *)header + sizeof(Da_Header))
 
 #define da_create(arena, T, size) internal_da_create(arena, size, sizeof(T))
 
