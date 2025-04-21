@@ -11,9 +11,9 @@
 
 #ifdef ARENA_DEBUG
     #define ARENA_DEBUG_INFO(info) do { \
-        printf("[UTIL ARENA] ");             \
-        printf info;                         \
-        printf("\n");                        \
+        printf("[UTIL ARENA] ");        \
+        printf info;                    \
+        printf("\n");                   \
     } while (0)
 #else
     #define ARENA_DEBUG_INFO(info)
@@ -40,8 +40,8 @@
 typedef struct Arena_Region Arena_Region;
 struct Arena_Region {
     Arena_Region *next;
-    size_t capacity;
-    size_t used;
+    u64 capacity;
+    u64 used;
     void *data;
     util_bool reallocatable;
 };
@@ -52,12 +52,12 @@ struct Arena {
     Arena_Region *start_reallocatable;
 };
 
-extern void *arena_alloc(Arena *a, size_t bytes);
-extern void *arena_realloc(Arena *a, void *ptr, size_t old_size, size_t new_size);
+extern void *arena_alloc(Arena *a, u64 bytes);
+extern void *arena_realloc(Arena *a, void *ptr, u64 old_size, u64 new_size);
 extern void arena_free(Arena *a);
 
-Arena_Region *internal_arena_region_create(size_t bytes);
-Arena_Region *internal_arena_region_create_reallocatable(size_t bytes);
+Arena_Region *internal_arena_region_create(u64 bytes);
+Arena_Region *internal_arena_region_create_reallocatable(u64 bytes);
 Arena_Region *internal_get_ptr_region(Arena *a, void *ptr);
 void internal_arena_region_push(Arena *a, Arena_Region *r);
 void internal_arena_region_push_reallocatable(Arena *a, Arena_Region *r);
@@ -66,9 +66,9 @@ void internal_arena_region_push_reallocatable(Arena *a, Arena_Region *r);
 
 #ifdef ARENA_IMPLEMENTATION
 
-Arena_Region *internal_arena_region_create(size_t bytes) {
+Arena_Region *internal_arena_region_create(u64 bytes) {
     Arena_Region *r;
-    size_t region_capacity;
+    u64 region_capacity;
 
     r = malloc(sizeof(Arena_Region));
     region_capacity = ARENA_MAX(ARENA_REGION_DEFAULT_CAPACITY, bytes * ARENA_REGION_ALLOC_FACTOR);
@@ -84,9 +84,9 @@ Arena_Region *internal_arena_region_create(size_t bytes) {
     return r;
 }
 
-Arena_Region *internal_arena_region_create_reallocatable(size_t bytes) {
+Arena_Region *internal_arena_region_create_reallocatable(u64 bytes) {
     Arena_Region *r;
-    size_t region_capacity;
+    u64 region_capacity;
 
     r = malloc(sizeof(Arena_Region));
     region_capacity = ARENA_MAX(ARENA_REGION_REALLOC_CAPACITY, bytes * ARENA_REGION_REALLOC_FACTOR);
@@ -138,7 +138,7 @@ void internal_arena_region_push_reallocatable(Arena *a, Arena_Region *r) {
     }
 }
 
-void *arena_alloc(Arena *a, size_t bytes) {
+void *arena_alloc(Arena *a, u64 bytes) {
     void *ptr;
 
     if (a == NULL) {
@@ -161,8 +161,8 @@ void *arena_alloc(Arena *a, size_t bytes) {
     return ptr;
 }
 
-void *arena_realloc(Arena *a, void *ptr, size_t old_size, size_t new_size) {
-    size_t i;
+void *arena_realloc(Arena *a, void *ptr, u64 old_size, u64 new_size) {
+    u64 i;
     Arena_Region *ptr_region;
 
     if (a == NULL) {

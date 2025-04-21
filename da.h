@@ -13,7 +13,7 @@
 #define da_create(arena, T, size) internal_da_create(arena, size, sizeof(T))
 
 #define da_push_back(da, value) do {       \
-    size_t new_size;                       \
+    u64 new_size;                          \
                                            \
     new_size = da_size(da) + 1;            \
     da = internal_da_resize(da, new_size); \
@@ -21,7 +21,7 @@
 } while (0)
 
 #define da_push(da, _pos, value) do {                 \
-    size_t i, new_size, pos;                          \
+    u64 i, new_size, pos;                             \
                                                       \
     pos = _pos;                                       \
                                                       \
@@ -45,7 +45,7 @@
 } while (0)
 
 #define da_pop(da, _pos) do {                    \
-    size_t i, size, pos;                         \
+    u64 i, size, pos;                            \
                                                  \
     pos = _pos;                                  \
                                                  \
@@ -62,26 +62,26 @@
 typedef struct Da_Header Da_Header;
 struct Da_Header {
     Arena *arena;
-    size_t size;
-    size_t stride;
+    u64 size;
+    u64 stride;
 };
 
-extern size_t da_size(void *da);
-extern size_t da_stride(void *da);
+extern u64 da_size(void *da);
+extern u64 da_stride(void *da);
 extern void da_pop_back(void *da);
 extern void *da_clone(Arena *a, void *orig);
 
 void *internal_da_append(void *dest, void *src);
-void *internal_da_insert(void *dest, void *src, size_t pos);
-void *internal_da_create(Arena *a, size_t size, size_t stride);
-void *internal_da_resize(void *da, size_t new_size);
+void *internal_da_insert(void *dest, void *src, u64 pos);
+void *internal_da_create(Arena *a, u64 size, u64 stride);
+void *internal_da_resize(void *da, u64 new_size);
 
 #endif /* DA_H_ */
 
 #ifdef DA_IMPLEMENTATION
 
-void *internal_da_create(Arena *a, size_t size, size_t stride) {
-    size_t allocd_size;
+void *internal_da_create(Arena *a, u64 size, u64 stride) {
+    u64 allocd_size;
     Da_Header *header;
 
     allocd_size = sizeof(Da_Header) + (size * stride);
@@ -96,10 +96,10 @@ void *internal_da_create(Arena *a, size_t size, size_t stride) {
     return DA_BODY(header);
 }
 
-void *internal_da_resize(void *da, size_t new_size) {
+void *internal_da_resize(void *da, u64 new_size) {
     Arena *a;
     Da_Header *header;
-    size_t old_alloc_size, new_alloc_size;
+    u64 old_alloc_size, new_alloc_size;
 
     header = DA_HEADER(da);
     a = header->arena;
@@ -114,14 +114,14 @@ void *internal_da_resize(void *da, size_t new_size) {
     return DA_BODY(header);
 }
 
-size_t da_size(void *da) {
+u64 da_size(void *da) {
     Da_Header *header;
 
     header = DA_HEADER(da);
     return header->size;
 }
 
-size_t da_stride(void *da) {
+u64 da_stride(void *da) {
     Da_Header *header;
 
     header = DA_HEADER(da);
@@ -145,7 +145,7 @@ void *da_clone(Arena *a, void *orig) {
 }
 
 void *internal_da_append(void *dest, void *src) {
-    size_t old_sizeb;
+    u64 old_sizeb;
     Da_Header *h_dest, *h_src;
 
     h_dest = DA_HEADER(dest);
@@ -158,9 +158,9 @@ void *internal_da_append(void *dest, void *src) {
     return dest;
 }
 
-void *internal_da_insert(void *dest, void *src, size_t pos) {
+void *internal_da_insert(void *dest, void *src, u64 pos) {
     void *mv_from, *mv_to;
-    size_t src_sizeb;
+    u64 src_sizeb;
     Da_Header *h_dest, *h_src;
 
     h_dest = DA_HEADER(dest);
