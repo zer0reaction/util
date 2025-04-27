@@ -54,8 +54,8 @@
 
 /* ---------- Dynamic array ---------- */
 
-#define DA_HEADER(da) ((Da_Header *)da - 1)
-#define DA_BODY(header) (void *)((char *)header + sizeof(Da_Header))
+#define DA_HEADER(da) ((Da_Header *)(da) - 1)
+#define DA_BODY(header) (void *)((char *)(header) + sizeof(Da_Header))
 
 #define da_create(arena, T, size) internal_da_create(arena, size, sizeof(T))
 
@@ -64,7 +64,7 @@
                                            \
     new_size = da_size(da) + 1;            \
     da = internal_da_resize(da, new_size); \
-    da[new_size - 1] = value;              \
+    (da)[new_size - 1] = value;            \
 } while (0)
 
 #define da_push(da, _pos, value) do {                 \
@@ -79,10 +79,10 @@
                                                       \
     da = internal_da_resize(da, new_size);            \
     for (i = new_size - 1; i > pos; --i) {            \
-        da[i] = da[i - 1];                            \
+        (da)[i] = (da)[i - 1];                        \
     }                                                 \
                                                       \
-    da[pos] = value;                                  \
+    (da)[pos] = value;                                \
 } while (0)
 
 #define da_pop(da, _pos) do {                    \
@@ -96,7 +96,7 @@
     assert(pos < size && "da_pop: invalid pos"); \
                                                  \
     for (i = pos; i < size - 1; ++i) {           \
-        da[i] = da[i + 1];                       \
+        (da)[i] = (da)[i + 1];                   \
     }                                            \
                                                  \
     DA_HEADER(da)->size--;                       \
