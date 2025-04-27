@@ -5,7 +5,7 @@
 #include <assert.h>
 #include <string.h>
 
-/* ---------- Info ---------- */
+/* ---------- Info preproc ---------- */
 
 #ifdef ENABLE_INFO
     #include <stdio.h>
@@ -18,7 +18,7 @@
     #define INFO(caller, info)
 #endif /* ENABLE_INFO */
 
-/* ---------- Arena ---------- */
+/* ---------- Arena preproc ---------- */
 
 #ifdef ARENA_DEBUG
     #include <stdio.h>
@@ -52,7 +52,7 @@
 
 #define ARENA_MAX(a, b) ((a > b) ? a : b)
 
-/* ---------- Dynamic array ---------- */
+/* ---------- Dynamic array preproc ---------- */
 
 #define DA_HEADER(da) ((Da_Header *)(da) - 1)
 #define DA_BODY(header) (void *)((char *)(header) + sizeof(Da_Header))
@@ -124,7 +124,7 @@ typedef double f64;
 typedef unsigned char c8;
 typedef unsigned short int c16;
 
-/* ---------- Arena ---------- */
+/* ---------- Arena types ---------- */
 
 typedef struct Arena_Region Arena_Region;
 struct Arena_Region {
@@ -141,7 +141,7 @@ struct Arena {
     Arena_Region *start_reallocatable;
 };
 
-/* ---------- Dynamic array ---------- */
+/* ---------- Dynamic array types ---------- */
 
 typedef struct Da_Header Da_Header;
 struct Da_Header {
@@ -150,7 +150,7 @@ struct Da_Header {
     u64 stride;
 };
 
-/* ---------- Arena ---------- */
+/* ---------- Arena function declarations ---------- */
 
 extern void *arena_alloc(Arena *a, u64 bytes);
 extern void *arena_realloc(Arena *a, void *ptr, u64 old_size, u64 new_size);
@@ -162,7 +162,7 @@ Arena_Region *internal_get_ptr_region(Arena *a, void *ptr);
 void internal_arena_region_push(Arena *a, Arena_Region *r);
 void internal_arena_region_push_reallocatable(Arena *a, Arena_Region *r);
 
-/* ---------- Dynamic array ---------- */
+/* ---------- Dynamic array function declarations ---------- */
 
 extern u64 da_size(void *da);
 extern u64 da_stride(void *da);
@@ -178,7 +178,7 @@ void *internal_da_resize(void *da, u64 new_size);
 
 #ifdef UTIL_IMPLEMENTATION
 
-/* ---------- Arena ---------- */
+/* ---------- Arena function defenitions ---------- */
 
 Arena_Region *internal_arena_region_create(u64 bytes) {
     Arena_Region *r = NULL;
@@ -328,7 +328,7 @@ void arena_free(Arena *a) {
         Arena_Region *next_region = NULL;
 
         ARENA_DEBUG_INFO(("Freeing reallocatable region (%lu/%lu)", r->used, r->capacity));
-        
+
         next_region = r->next;
         free(r->data);
         free(r);
@@ -339,7 +339,7 @@ void arena_free(Arena *a) {
     a->start_reallocatable = NULL;
 }
 
-/* ---------- Dynamic array ---------- */
+/* ---------- Dynamic array function defenitions ---------- */
 
 void *internal_da_create(Arena *a, u64 size, u64 stride) {
     u64 allocd_size = 0;
