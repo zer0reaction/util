@@ -1,7 +1,5 @@
-#define DEBUG
-#include "typedef.h"
-#include "info.h"
-#include <assert.h>
+#define ENABLE_INFO
+#include "util.h"
 
 int main(void) {
     assert(sizeof(i8) == 1);
